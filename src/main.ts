@@ -1,5 +1,7 @@
 import { join } from 'path';
 import { createReadStream, createWriteStream } from "fs";
+import fetch, { Headers } from 'node-fetch';
+import { parse as parseCSS, ParseOptions } from 'css-tree';
 
 // == =========================================================================
 const targets = {
@@ -65,4 +67,46 @@ async function readCSS(path: string) {
       })
       .on('error', reject);
   });
+}
+
+// == =========================================================================
+const parseOptions: ParseOptions = {
+  parseAtrulePrelude: false,
+  parseRulePrelude:   false,
+  parseValue:         false
+};
+
+async function loadAST(dirPath: string, url = targets.korean, parseOption = parseOptions) {
+  const cssPath = getCSSPath(dirPath, url);
+  if (!existsSync(dirPath)) {
+    mkdirSync(dirPath);
+  }
+  if (!existsSync(cssPath)) {
+    await saveCSS(cssPath, url);
+  }
+
+  const css = await readCSS(cssPath);
+  const ast = await parseCSS(css, parseOption);
+  return ast;
+}
+
+function parseUnicodeRanges(parsed) {
+  const fontFaceL = parsed.children;
+  const uniRangeL = fontFaceL.map((faceValObj => {
+    const faceBlockL     = faceValObj.block.children;
+    const uniRangeBlockL = faceBlockL.filter(faceBlock => faceBlock.property === "unicode-range");
+    const uniRangeL      = uniRangeBlockL.map(uniRangeBlock => uniRangeBlock.value.value);
+    return uniRangeL.head.data;
+  }));
+
+  const uniRanges: string[] = [];
+  uniRangeL.forEach(unicodeRange => {
+    uniRanges.push(unicodeRange);
+  });
+  return uniRanges;
+}
+
+export async function getUnicodeRanges(dirPath = "src", url = targets.korean) {
+  const ast = await loadAST(dirPath, url);
+  return parseUnicodeRanges(ast);
 }
