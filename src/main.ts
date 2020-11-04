@@ -1,32 +1,68 @@
-/**
- * Some predefined delays (in milliseconds).
- */
-export enum Delays {
-  Short = 500,
-  Medium = 2000,
-  Long = 5000,
+import { join } from 'path';
+import { createReadStream, createWriteStream } from "fs";
+
+// == =========================================================================
+const targets = {
+  weston:   "https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap",
+  korean:   "https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap",
+  japanese: "https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap",
+  chinese:  "https://fonts.googleapis.com/css2?family=Noto+Sans+SC&display=swap",
+  chinese_traditional: "https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap",
+};
+
+function getFontName(url: string) {
+  const encodedURL = decodeURI(url);
+  const urlObj     = new URL(encodedURL);
+  const urlParams  = urlObj.searchParams;
+  const fontName   = urlParams.get("family");
+  return fontName;
 }
 
-/**
- * Returns a Promise<string> that resolves after given time.
- *
- * @param {string} name - A name.
- * @param {number=} [delay=Delays.Medium] - Number of milliseconds to delay resolution of the Promise.
- * @returns {Promise<string>}
- */
-function delayedHello(
-  name: string,
-  delay: number = Delays.Medium,
-): Promise<string> {
-  return new Promise((resolve: (value?: string) => void) =>
-    setTimeout(() => resolve(`Hello, ${name}`), delay),
-  );
+function getCSSPath(dirPath: string, url: string) {
+  const fontName = getFontName(url);
+  const cssPath  = join(dirPath, fontName + ".css");
+  return cssPath;
 }
 
-// Below are examples of using ESLint errors suppression
-// Here it is suppressing missing return type definitions for greeter function
+// == ==========================================================================
+async function saveCSS(path: string, url: string) {
+  // Fake header
+  const headers = new Headers({
+    "Accept": "text/html,application/xhtml+xml,application/xml;",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0"
+  });
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export async function greeter(name: string) {
-  return await delayedHello(name, Delays.Long);
+  const res = await fetch(url, {
+    method: "GET",
+    headers: headers
+  });
+  const fileStream = createWriteStream(path);
+
+  await new Promise<void>((resolve, reject) => {
+    res.body.pipe(fileStream);
+    res.body.on("error", (err) => {
+      console.log('File write Error.');
+      reject(err);
+    });
+    fileStream.on("finish", function() {
+      resolve();
+    });
+  });
+}
+
+async function readCSS(path: string) {
+  return new Promise<string>((resolve, reject) => {
+    const readData: string[] = [];
+    createReadStream(path)
+      .on('data', (data) => {
+        readData.push(data);
+      })
+      .on('end', async () => {
+        await Promise.all(readData);
+        const css = readData.join('');
+
+        resolve(css);
+      })
+      .on('error', reject);
+  });
 }
