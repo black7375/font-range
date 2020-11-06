@@ -1,82 +1,52 @@
-[![Sponsor][sponsor-badge]][sponsor]
 [![TypeScript version][ts-badge]][typescript-4-0]
 [![Node.js version][nodejs-badge]][nodejs]
 [![APLv2][license-badge]][license]
-[![Build Status - Travis][travis-badge]][travis-ci]
-[![Build Status - GitHub Actions][gha-badge]][gha-ci]
 
-# node-typescript-boilerplate
+# Font Range(WIP)
 
-👩🏻‍💻 Developer Ready: A comprehensive template. Works out of the box for most [Node.js][nodejs] projects.
+| ![NJ](https://raw.githubusercontent.com/black7375/font-range/master/resource/News_Japanese.gif) | ![NK](https://raw.githubusercontent.com/black7375/font-range/master/resource/News_Korean.gif) | ![NC](https://raw.githubusercontent.com/black7375/font-range/master/resource/News_Chinese.gif) |
+|-------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
 
-🏃🏽 Instant Value: All basic tools included and configured:
+Google Font provides a subset of [Korean](https://design.google/news/google-fonts-launches-korean-support-and-unveils-faster-delivery-system/), [Japanese](https://design.google/news/google-fonts-launches-japanese-supportand-makes-loading-large-fonts-even-faster/), and [Chinese](https://design.google/news/google-fonts-launches-chinese-support/) **Slicing Patterns** through machine learning.
 
-- [TypeScript][typescript] [4.0][typescript-4-0]
-- [ESLint][eslint] with some initial rules recommendation
-- [Jest][jest] for fast unit testing and code coverage
-- Type definitions for Node.js and Jest
-- [Prettier][prettier] to enforce consistent code style
-- NPM [scripts](#available-scripts) for common operations
-- Simple example of TypeScript code and unit test
-- .editorconfig for consistent file format
-- Reproducible environments thanks to [Volta][volta]
-- Example configuration for [GitHub Actions][gh-actions] and [Travis CI][travis]
+**Font Range** helps you to subset using `unicode range` in Google Fonts.
 
-🤲 Free as in speech: available under the APLv2 license.
+| ![K0](https://raw.githubusercontent.com/black7375/font-range/master/resource/Korean_0.png) | ![K1](https://raw.githubusercontent.com/black7375/font-range/master/resource/Korean_!.png) |
+|--------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
 
-## Getting Started
+![Result](https://raw.githubusercontent.com/black7375/font-range/master/resource/Korean_Japanese.png)
 
-This project is intended to be used with the latest Active LTS release of [Node.js][nodejs].
+## Usage
+Google font `CSS file`(include `unicode-range` file) url and `font path` are fine.
 
-### Use as a repository template
+```js
+fontRange(google_font_css_url, font_path);
+fontRange(google_font_css_url, font_path, save_path, format); // Options
+```
+- `save_path`'s default: `font_path`
+- `format`'s default: `woff2`
 
-To start, just click the **[Use template][repo-template-action]** link (or the green button). Now start adding your code in the `src` and unit tests in the `__tests__` directories.
-
-### Clone repository
-
-To clone the repository use the following commands:
+### Requires
+It has dependencies on the following packages:
 
 ```sh
-git clone https://github.com/jsynowiec/node-typescript-boilerplate
-cd node-typescript-boilerplate
-npm install
+pip install fonttools[ufo,woff,unicode]  zopfli brotli
 ```
 
-### Download latest release
+### CSS URL?
+The URL of [`Noto Sans`](https://www.google.com/get/noto/) is included in the package.
 
-Download and unzip current `master` branch or one of tags:
+![Noto](https://raw.githubusercontent.com/black7375/font-range/master/resource/Noto_0.png)
 
-```sh
-wget https://github.com/jsynowiec/node-typescript-boilerplate/archive/master.zip -O node-typescript-boilerplate.zip
-unzip node-typescript-boilerplate.zip && rm node-typescript-boilerplate.zip
+```js
+const targets = {
+  weston:   "https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap",
+  korean:   "https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap",
+  japanese: "https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap",
+  chinese:  "https://fonts.googleapis.com/css2?family=Noto+Sans+SC&display=swap",
+  chinese_traditional: "https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap",
+};
 ```
-
-## Available Scripts
-
-- `clean` - remove coverage data, Jest cache and transpiled files,
-- `build` - transpile TypeScript to ES6,
-- `build:watch` - interactive watch mode to automatically transpile source files,
-- `lint` - lint source files and tests,
-- `test` - run tests,
-- `test:watch` - interactive watch mode to automatically re-run tests
-
-## Additional Informations
-
-### Why include Volta
-
-[Volta][volta]’s toolchain always keeps track of where you are, it makes sure the tools you use always respect the settings of the project you’re working on. This means you don’t have to worry about changing the state of your installed software when switching between projects. For example, it's [used by engineers at LinkedIn][volta-tomdale] to standarize tools and have reproducible development environments.
-
-I recommend to [install][volta-getting-started] Volta and use it to manage your project's toolchain.
-
-### Writing tests in JavaScript
-
-Writing unit tests in TypeScript can sometimes be troublesome and confusing. Especially when mocking dependencies and using spies.
-
-This is **optional**, but if you want to learn how to write JavaScript tests for TypeScript modules, read the [corresponding wiki page][wiki-js-tests].
-
-## Backers & Sponsors
-
-Support this project by becoming a [sponsor][sponsor].
 
 ## License
 
@@ -85,23 +55,6 @@ Licensed under the APLv2. See the [LICENSE](https://github.com/jsynowiec/node-ty
 [ts-badge]: https://img.shields.io/badge/TypeScript-4.0-blue.svg
 [nodejs-badge]: https://img.shields.io/badge/Node.js->=%2012.13-blue.svg
 [nodejs]: https://nodejs.org/dist/latest-v12.x/docs/api/
-[travis-badge]: https://travis-ci.org/jsynowiec/node-typescript-boilerplate.svg?branch=master
-[travis-ci]: https://travis-ci.org/jsynowiec/node-typescript-boilerplate
-[gha-badge]: https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fjsynowiec%2Fnode-typescript-boilerplate%2Fbadge&style=flat
-[gha-ci]: https://github.com/jsynowiec/node-typescript-boilerplate/actions
-[typescript]: https://www.typescriptlang.org/
 [typescript-4-0]: https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-0.html
 [license-badge]: https://img.shields.io/badge/license-APLv2-blue.svg
 [license]: https://github.com/jsynowiec/node-typescript-boilerplate/blob/master/LICENSE
-[sponsor-badge]: https://img.shields.io/badge/♥-Sponsor-fc0fb5.svg
-[sponsor]: https://github.com/sponsors/jsynowiec
-[jest]: https://facebook.github.io/jest/
-[eslint]: https://github.com/eslint/eslint
-[wiki-js-tests]: https://github.com/jsynowiec/node-typescript-boilerplate/wiki/Unit-tests-in-plain-JavaScript
-[prettier]: https://prettier.io
-[volta]: https://volta.sh
-[volta-getting-started]: https://docs.volta.sh/guide/getting-started
-[volta-tomdale]: https://twitter.com/tomdale/status/1162017336699838467?s=20
-[gh-actions]: https://github.com/features/actions
-[travis]: https://travis-ci.org
-[repo-template-action]: https://github.com/jsynowiec/node-typescript-boilerplate/generate
