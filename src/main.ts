@@ -129,9 +129,9 @@ function formatOption(format: string, ext = true) {
   if(ext) return "." + formatName;
 
   if(format === "otf" || format === "ttf") return "";
-  return "--flavor='" + (format === "woff-zopfli")
+  return "--flavor='" + ((format === "woff-zopfli")
        ? formatName + "' --with-zopfli "
-       : formatName + "' ";
+       : formatName + "' ");
 }
 
 export function fontRange(url = targets.korean, fontPath = "", savePath?: string,
