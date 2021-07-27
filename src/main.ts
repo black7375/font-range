@@ -1,10 +1,10 @@
 import { join, parse } from 'path';
-import { createReadStream, createWriteStream, existsSync, mkdirSync } from "fs";
+import { createReadStream, createWriteStream, existsSync, mkdirSync } from 'fs';
 import fetch, { Headers } from 'node-fetch';
 import { parse as parseCSS, ParseOptions } from 'css-tree';
 import { exec } from 'child_process';
 
-// == =========================================================================
+// == Resouce Basics ==========================================================
 export const targets = {
   weston:   "https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap",
   korean:   "https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap",
@@ -27,7 +27,7 @@ function getCSSPath(dirPath: string, url: string) {
   return cssPath;
 }
 
-// == ==========================================================================
+// == CSS I/O ==================================================================
 async function saveCSS(path: string, url: string) {
   // Fake header
   const headers = new Headers({
@@ -70,7 +70,7 @@ async function readCSS(path: string) {
   });
 }
 
-// == =========================================================================
+// == CSS Parse ===============================================================
 const parseOptions: ParseOptions = {
   parseAtrulePrelude: false,
   parseRulePrelude:   false,
@@ -112,7 +112,7 @@ export async function getUnicodeRanges(dirPath = "src", url = targets.korean) {
   return parseUnicodeRanges(ast);
 }
 
-// == =========================================================================
+// == Main ====================================================================
 function getFormat(format: string) {
   switch(format) {
     case "otf":   return "otf";
@@ -164,7 +164,6 @@ export function fontRange(url = targets.korean, fontPath = "", savePath?: string
                          join(dirPath, fontName + "_" + i + fontExt) + "' ";
       const unicodeRanges = eachRanges[i].split(', ').join(',');
       const unicodeOption = "--unicodes='" + unicodeRanges + "' ";
-      console.log(i + ": " + unicodeRanges);
 
       const options = " '" + fontPath + "' " + saveOption + unicodeOption
                     + convertOption + defautOptions;
