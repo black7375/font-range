@@ -1,31 +1,50 @@
-import { Delays, greeter } from '../src/main';
+import { targets, getUnicodeRanges, fontRange } from '../src/main';
+import { join, parse } from 'path';
+import { existsSync } from 'fs';
+import fetch from 'node-fetch';
 
-describe('greeter function', () => {
-  // Read more about fake timers
-  // http://facebook.github.io/jest/docs/en/timer-mocks.html#content
-  jest.useFakeTimers();
-
-  const name = 'John';
-  let hello: string;
-
-  // Act before assertions
-  beforeAll(async () => {
-    const p: Promise<string> = greeter(name);
-    jest.runOnlyPendingTimers();
-    hello = await p;
+describe("Preset Check", () => {
+  it("Target URLs access check", () => {
+    for ( const targetName in targets ) {
+      const targetAccess = fetch(targets[targetName]);
+      targetAccess.then(res => {
+        expect(res.status).toBe(200);
+      });
+    }
   });
 
-  // Assert if setTimeout was called properly
-  it('delays the greeting by 2 seconds', () => {
-    expect(setTimeout).toHaveBeenCalledTimes(1);
-    expect(setTimeout).toHaveBeenLastCalledWith(
-      expect.any(Function),
-      Delays.Long,
-    );
+  it("Python command check", () => {
+    const commandExists = require("command-exists");
+    commandExists("pyftsubset", (err, commandExists) => {
+      expect(commandExists).toBe(true);
+      if (err) {
+        console.log(err);
+      }
+    });
+  });
+});
+
+describe("FontRange Feature", () => {
+  const fontPath = join("__tests__", "font", "NotoSansKR-Regular.otf");
+  const fontInfo = parse(fontPath);
+  const fontDir  = fontInfo.dir;
+  const fontName = fontInfo.name;
+  beforeAll(() => {
+    fontRange(targets.korean, fontPath);
   });
 
-  // Assert greeter result
-  it('greets a user with `Hello, {name}` message', () => {
-    expect(hello).toBe(`Hello, ${name}`);
+  it("Check CSS Download", () => {
+    const cssPath = join(fontDir, "Noto Sans KR.css");
+    expect(existsSync(cssPath)).toBe(true);
+  });
+
+  it("Font Created Check", () => {
+    let counts = 0;
+    const ranges = getUnicodeRanges(fontDir, targets.korean);
+    ranges.then(() => {
+      const eachFontPath = join(fontDir, fontName + "_" + counts + ".woff2");
+      expect(existsSync(eachFontPath)).toBe(true);
+      counts++;
+    });
   });
 });
