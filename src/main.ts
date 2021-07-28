@@ -55,7 +55,7 @@ async function saveCSS(path: string, url: string) {
 
 async function readCSS(path: string) {
   return new Promise<string>((resolve, reject) => {
-    const readData: string[] = [];
+    const readData: (string | Buffer)[] = [];
     createReadStream(path)
       .on('data', (data) => {
         readData.push(data);
