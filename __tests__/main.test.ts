@@ -6,10 +6,8 @@ import fetch from 'node-fetch';
 describe("Preset Check", () => {
   it("Target URLs access check", async () => {
     for ( const targetName in targets ) {
-      const targetAccess = fetch(targets[targetName]);
-      await targetAccess.then(res => {
-        expect(res.status).toBe(200);
-      });
+      const res = await fetch(targets[targetName]);
+      expect(res.status).toBe(200);
     }
   });
 
@@ -30,7 +28,7 @@ describe("FontRange Feature", () => {
   const fontDir  = fontInfo.dir;
   const fontName = fontInfo.name;
   beforeAll(() => {
-    fontRange(targets.korean, fontPath);
+    return fontRange(targets.korean, fontPath);
   });
 
   it("Check CSS Download", () => {
@@ -39,12 +37,11 @@ describe("FontRange Feature", () => {
   });
 
   it("Font Created Check", async () => {
-    let counts = 0;
-    const ranges = getUnicodeRanges(fontDir, targets.korean);
-    await ranges.then(() => {
+    const ranges  = await getUnicodeRanges(fontDir, targets.korean);
+    const rangesL = ranges.length;
+    for (let counts = 0; counts < rangesL; counts++) {
       const eachFontPath = join(fontDir, fontName + "_" + counts + ".woff2");
       expect(existsSync(eachFontPath)).toBe(true);
-      counts++;
-    });
+    }
   });
 });

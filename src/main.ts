@@ -2,7 +2,7 @@ import { join, parse } from 'path';
 import { createReadStream, createWriteStream, existsSync, mkdirSync } from 'fs';
 import fetch, { Headers } from 'node-fetch';
 import { parse as parseCSS, ParseOptions } from 'css-tree';
-import { exec } from 'child_process';
+import { execSync } from 'child_process';
 
 // == Resouce Basics ==========================================================
 export const targets = {
@@ -135,7 +135,7 @@ function formatOption(format: string, ext = true) {
 }
 
 export function fontRange(url = targets.korean, fontPath = "", savePath?: string,
-                          format = "woff2"): void {
+                          format = "woff2"): Promise<Buffer[]> {
   const pathInfo = parse(fontPath);
   const fontDir  = pathInfo.dir;
   const fontName = pathInfo.name;
@@ -157,27 +157,14 @@ export function fontRange(url = targets.korean, fontPath = "", savePath?: string
   --name-IDs='*' \
   --name-languages='*'";
 
-  ranges.then(eachRanges => {
-    const eachRangesL = eachRanges.length;
-    for(let i = 0; i < eachRangesL; i++) {
-      const saveOption = "--output-file='" +
-                         join(dirPath, fontName + "_" + i + fontExt) + "' ";
-      const unicodeRanges = eachRanges[i].split(', ').join(',');
-      const unicodeOption = "--unicodes='" + unicodeRanges + "' ";
+  return ranges.then(eachRanges => eachRanges.map((unicodes, i) => {
+    const saveOption = "--output-file='" +
+      join(dirPath, fontName + "_" + i + fontExt) + "' ";
+    const unicodeRanges = unicodes.split(', ').join(',');
+    const unicodeOption = "--unicodes='" + unicodeRanges + "' ";
 
-      const options = " '" + fontPath + "' " + saveOption + unicodeOption
-                    + convertOption + defautOptions;
-      exec("pyftsubset" + options, (error, stdout, stderr) => {
-        if(error) {
-          console.log("error: " + error.message);
-          return;
-        }
-        if(stderr) {
-          console.log("stderr: " + stderr);
-          return;
-        }
-        console.log("stdout: " + stdout);
-      });
-    }
-  });
+    const options = " '" + fontPath + "' " + saveOption + unicodeOption
+      + convertOption + defautOptions;
+    return execSync("pyftsubset" + options);
+  }));
 }
