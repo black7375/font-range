@@ -4,17 +4,17 @@ import { existsSync } from 'fs';
 import fetch from 'node-fetch';
 
 describe("Preset Check", () => {
-  it("Target URLs access check", () => {
+  it("Target URLs access check", async () => {
     for ( const targetName in targets ) {
       const targetAccess = fetch(targets[targetName]);
-      targetAccess.then(res => {
+      await targetAccess.then(res => {
         expect(res.status).toBe(200);
       });
     }
   });
 
-  it("Python command check", () => {
-    const commandExists = require("command-exists");
+  it("Python command check", async () => {
+    const commandExists = await import("command-exists");
     commandExists("pyftsubset", (err, commandExists) => {
       expect(commandExists).toBe(true);
       if (err) {
@@ -38,10 +38,10 @@ describe("FontRange Feature", () => {
     expect(existsSync(cssPath)).toBe(true);
   });
 
-  it("Font Created Check", () => {
+  it("Font Created Check", async () => {
     let counts = 0;
     const ranges = getUnicodeRanges(fontDir, targets.korean);
-    ranges.then(() => {
+    await ranges.then(() => {
       const eachFontPath = join(fontDir, fontName + "_" + counts + ".woff2");
       expect(existsSync(eachFontPath)).toBe(true);
       counts++;

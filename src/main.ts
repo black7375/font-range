@@ -107,7 +107,7 @@ function parseUnicodeRanges(parsed) {
   return uniRanges;
 }
 
-export async function getUnicodeRanges(dirPath = "src", url = targets.korean) {
+export async function getUnicodeRanges(dirPath = "src", url = targets.korean): Promise<string[]> {
   const ast = await loadAST(dirPath, url);
   return parseUnicodeRanges(ast);
 }
@@ -135,13 +135,13 @@ function formatOption(format: string, ext = true) {
 }
 
 export function fontRange(url = targets.korean, fontPath = "", savePath?: string,
-                          format = "woff2") {
+                          format = "woff2"): void {
   const pathInfo = parse(fontPath);
   const fontDir  = pathInfo.dir;
   const fontName = pathInfo.name;
   const fontExt  = formatOption(format);
 
-  const dirPath  = (savePath! === undefined) ? fontDir : savePath;
+  const dirPath  = (savePath === undefined) ? fontDir : savePath;
   const ranges   = getUnicodeRanges(dirPath, url);
 
   const convertOption = formatOption(format, false);
