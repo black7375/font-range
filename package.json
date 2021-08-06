@@ -1,7 +1,28 @@
 {
-  "name": "node-typescript-boilerplate",
-  "version": "0.0.0",
-  "description": "Minimalistic boilerplate to quick-start Node.js development in TypeScript.",
+  "name": "font-range",
+  "description": " Font subset with google font's ML result.",
+  "version": "0.1.0",
+  "author": "black7375 <alstjr7375@daum.net>",
+  "license": "MIT",
+  "keywords": [
+    "font",
+    "fonts",
+    "webfonts",
+    "subset",
+    "woff",
+    "woff2",
+    "css",
+    "unicode-range",
+    "fonttools"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/black7375/font-range.git"
+  },
+  "bugs": {
+    "url": "https://github.com/black7375/font-range/issues"
+  },
+  "homepage": "https://github.com/black7375/font-range#readme",
   "engines": {
     "node": ">= 12.13 <16"
   },
@@ -29,8 +50,6 @@
     "test": "jest --coverage --detectOpenHandles",
     "test:watch": "jest --watch"
   },
-  "author": "Jakub Synowiec <github@jakubsynowiec.info>",
-  "license": "Apache-2.0",
   "dependencies": {
     "@types/css-tree": "^1.0.6",
     "@types/node-fetch": "^2.5.12",
