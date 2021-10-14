@@ -1,6 +1,6 @@
 import { targets, getUnicodeRanges, fontRange } from '../src/main';
 import { join, parse } from 'path';
-import { existsSync } from 'fs';
+import { existsSync, unlink, NoParamCallback } from 'fs';
 import fetch from 'node-fetch';
 
 describe("Preset Check", () => {
@@ -22,11 +22,37 @@ describe("Preset Check", () => {
   });
 });
 
-describe("FontRange Feature", () => {
-  const fontPath = join("__tests__", "font", "NotoSansKR-Regular.otf");
-  const fontInfo = parse(fontPath);
-  const fontDir  = fontInfo.dir;
-  const fontName = fontInfo.name;
+const fontPath = join("__tests__", "font", "NotoSansKR-Regular.otf");
+const fontInfo = parse(fontPath);
+const fontDir  = fontInfo.dir;
+const fontName = fontInfo.name;
+const errCallback: NoParamCallback = (err) => {
+  if(err) {
+    console.error(err);
+    return;
+  }
+}
+
+describe("FontRange Offline Feature", () => {
+  const cssPath = join("__tests__", "font", "NotoSansKR-Local.css");
+  beforeAll(() => {
+    return fontRange(cssPath, fontPath);
+  });
+
+  it("Font Created Check", async () => {
+    const ranges  = await getUnicodeRanges(fontDir, cssPath);
+    const rangesL = ranges.length;
+    for (let counts = 0; counts < rangesL; counts++) {
+      const eachFontPath = join(fontDir, fontName + "_" + counts + ".woff2");
+      expect(existsSync(eachFontPath)).toBe(true);
+
+      // Remove file
+      unlink(eachFontPath, errCallback);
+    }
+  });
+});
+
+describe("FontRange Online Feature", () => {
   beforeAll(() => {
     return fontRange(targets.korean, fontPath);
   });
