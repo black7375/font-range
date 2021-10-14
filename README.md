@@ -2,7 +2,7 @@
 [![Node.js version][nodejs-badge]][nodejs]
 [![APLv2][license-badge]][license]
 
-# Font Range(WIP)
+# Font Range
 
 | ![NJ](https://raw.githubusercontent.com/black7375/font-range/master/resource/News_Japanese.gif) | ![NK](https://raw.githubusercontent.com/black7375/font-range/master/resource/News_Korean.gif) | ![NC](https://raw.githubusercontent.com/black7375/font-range/master/resource/News_Chinese.gif) |
 |-------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
