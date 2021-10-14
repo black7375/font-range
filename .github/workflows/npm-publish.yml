@@ -4,8 +4,9 @@
 name: Publishing
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      'v*'
 
 jobs:
   build:
@@ -46,10 +47,10 @@ jobs:
       matrix:
         include:
           - branch: master
-            token: ${{ secrets.NPM_TOKEN }}
+            token: NPM_TOKEN
             registry: https://registry.npmjs.org/
           - branch: github-repo
-            token: ${{ secrets.GITHUB_TOKEN }}
+            token: GITHUB_TOKEN
             registry: https://npm.pkg.github.com/
     steps:
     - uses: actions/checkout@v2
@@ -85,4 +86,4 @@ jobs:
         CI: true
     - run: npm publish
       env:
-        NODE_AUTH_TOKEN: ${{ matrix.token }}
+        NODE_AUTH_TOKEN: ${{ secrets[matrix.token] }}
