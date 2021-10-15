@@ -131,6 +131,47 @@ export async function getUnicodeRanges(dirPath = "src", url = targets.korean): P
   return parseUnicodeRanges(ast);
 }
 
+// == Options =================================================================
+interface fontRangeOptionI {
+  savePath:    string;
+  format:      string;
+  nameFormat:  string;
+  defaultArgs: string;
+  etcArgs:     string;
+}
+
+function getDefaultOptions(): RequiredByValueExcept<fontRangeOptionI, 'savePath'> {
+  return {
+    format:      "woff2",
+    nameFormat:  "{NAME}_{INDEX}{EXT}",
+    defaultArgs: "--layout-features='*' \
+                  --glyph-names \
+                  --symbol-cmap \
+                  --legacy-cmap \
+                  --notdef-glyph \
+                  --notdef-outline \
+                  --recommended-glyphs \
+                  --name-legacy \
+                  --drop-tables= \
+                  --name-IDs='*' \
+                  --name-languages='*'",
+    etcArgs:      ""
+  };
+}
+
+function getOption(options: Partial<fontRangeOptionI>, key: keyof fontRangeOptionI, alterValue: ValueOf<fontRangeOptionI>) {
+  return options.hasOwnProperty(key)
+    ? options[key]
+    : alterValue;
+}
+
+function getName(nameFormat: string, fontName: string, index: number, fontExt: string) {
+  return nameFormat
+    .replace( "{NAME}", fontName)
+    .replace("{INDEX}", index.toString())
+    .replace(  "{EXT}", fontExt);
+}
+
 // == Main ====================================================================
 function getFormat(format: string) {
   switch(format) {
@@ -153,41 +194,12 @@ function formatOption(format: string, ext = true) {
        : formatName + "' ");
 }
 
-interface fontRangeOptionI {
-  savePath: string;
-  format:   string;
-  defaultArgs: string;
-  etcArgs: string;
-}
-
-const defaultOptions: RequiredByValueExcept<fontRangeOptionI, 'savePath'> = {
-  format: "woff2",
-  defaultArgs: "--layout-features='*' \
-    --glyph-names \
-    --symbol-cmap \
-    --legacy-cmap \
-    --notdef-glyph \
-    --notdef-outline \
-    --recommended-glyphs \
-    --name-legacy \
-    --drop-tables= \
-    --name-IDs='*' \
-    --name-languages='*'",
-  etcArgs: ""
-};
-
-function getOption(options: Partial<fontRangeOptionI>, key: keyof fontRangeOptionI, alterValue: ValueOf<fontRangeOptionI>) {
-  return options.hasOwnProperty(key)
-    ? options[key]
-    : alterValue;
-}
-
 export function fontRange(
   url = targets.korean, fontPath = "",
   fontRangeOption?: fontRangeOptionI['savePath'] | Partial<fontRangeOptionI>
 ): Promise<Buffer[]> {
   const options = Object.assign(
-    defaultOptions,
+    getDefaultOptions(),
     typeof(fontRangeOption) === 'string'
       ? { savePath: fontRangeOption }
       : fontRangeOption
@@ -206,9 +218,10 @@ export function fontRange(
   const defaultOption = options.defaultArgs;
   const etcOption     = options.etcArgs;
 
+  const nameFormat = options.nameFormat;
   return ranges.then(eachRanges => eachRanges.map((unicodes, i) => {
     const saveOption = "--output-file='" +
-      join(dirPath, fontName + "_" + i + fontExt) + "' ";
+      join(dirPath, getName(nameFormat, fontName, i, fontExt)) + "' ";
     const unicodeRanges = unicodes.split(', ').join(',');
     const unicodeOption = "--unicodes='" + unicodeRanges + "' ";
 

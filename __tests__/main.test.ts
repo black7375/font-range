@@ -36,14 +36,16 @@ const errCallback: NoParamCallback = (err) => {
 describe("FontRange Offline Feature", () => {
   const cssPath = join("__tests__", "font", "NotoSansKR-Local.css");
   beforeAll(() => {
-    return fontRange(cssPath, fontPath);
+    return fontRange(cssPath, fontPath, {
+      nameFormat: "{NAME}.subset.{INDEX}{EXT}"
+    });
   });
 
   it("Font Created Check", async () => {
     const ranges  = await getUnicodeRanges(fontDir, cssPath);
     const rangesL = ranges.length;
     for (let counts = 0; counts < rangesL; counts++) {
-      const eachFontPath = join(fontDir, fontName + "_" + counts + ".woff2");
+      const eachFontPath = join(fontDir, fontName + ".subset." + counts + ".woff2");
       expect(existsSync(eachFontPath)).toBe(true);
 
       // Remove file
@@ -68,6 +70,9 @@ describe("FontRange Online Feature", () => {
     for (let counts = 0; counts < rangesL; counts++) {
       const eachFontPath = join(fontDir, fontName + "_" + counts + ".woff2");
       expect(existsSync(eachFontPath)).toBe(true);
+
+      // Remove file
+      unlink(eachFontPath, errCallback);
     }
   });
 });

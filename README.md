@@ -23,27 +23,30 @@ Google font `CSS file`(include `unicode-range` file) url and `font path` are fin
 fontRange(google_font_css_url, font_path);
 fontRange(google_font_css_url, font_path, save_path); // Option1
 fontRange(google_font_css_url, font_path, {
-  savePath: "<SAVE SUBSET PATH>",
-  format: "<FONT FORMAT>",
+  savePath:    "<SAVE SUBSET PATH>",
+  format:      "<FONT FORMAT>",
+  nameForamt:  "<NAME FORAMT>",
   defaultArgs: "<Default Args>",
-  etcArgs: "<ETC pyftsubset args>"
+  etcArgs:     "<ETC pyftsubset args>"
 }); // Option2
 ```
-- `save_path`'s default: `font_path`
-- `format`'s default: `woff2`
+- `save_path`'s default: `<font_path>`
+- `format`'s default: `"woff2"`
+- `nameFormat`'s default: `"{NAME}_{INDEX}{EXT}"`
 - `defaultArgs`'s default:
 ```
---layout-features='*' \
---glyph-names \
---symbol-cmap \
---legacy-cmap \
---notdef-glyph \
---notdef-outline \
---recommended-glyphs \
---name-legacy \
---drop-tables= \
---name-IDs='*' \
---name-languages='*'
+"--layout-features='*' \
+ --glyph-names \
+ --symbol-cmap \
+ --legacy-cmap \
+ --notdef-glyph \
+ --notdef-outline \
+ --recommended-glyphs \
+ --name-legacy \
+ --drop-tables= \
+ --name-IDs='*' \
+ --name-languages='*'
+"
 ```
 - `etcArgs`'s default: `""`
 
@@ -77,5 +80,5 @@ Licensed under the APLv2. See the [LICENSE](https://github.com/jsynowiec/node-ty
 [nodejs-badge]: https://img.shields.io/badge/Node.js->=%2012.13-blue.svg
 [nodejs]: https://nodejs.org/dist/latest-v12.x/docs/api/
 [typescript-4-0]: https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-0.html
-[license-badge]: https://img.shields.io/badge/license-APLv2-blue.svg
-[license]: https://github.com/jsynowiec/node-typescript-boilerplate/blob/master/LICENSE
+[license-badge]: https://img.shields.io/badge/license-MIT-blue
+[license]: https://github.com/black7375/font-range/blob/master/LICENSE
