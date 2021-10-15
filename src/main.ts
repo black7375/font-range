@@ -3,6 +3,7 @@ import { createReadStream, createWriteStream, existsSync, mkdirSync } from 'fs';
 import fetch, { Headers } from 'node-fetch';
 import { parse as parseCSS, ParseOptions } from 'css-tree';
 import { execSync } from 'child_process';
+import { RequiredByValueExcept, ValueOf } from './types';
 
 // == Resouce Basics ==========================================================
 export const targets = {
@@ -152,28 +153,58 @@ function formatOption(format: string, ext = true) {
        : formatName + "' ");
 }
 
-export function fontRange(url = targets.korean, fontPath = "", savePath?: string,
-                          format = "woff2"): Promise<Buffer[]> {
+interface fontRangeOptionI {
+  savePath: string;
+  format:   string;
+  defaultArgs: string;
+  etcArgs: string;
+}
+
+const defaultOptions: RequiredByValueExcept<fontRangeOptionI, 'savePath'> = {
+  format: "woff2",
+  defaultArgs: "--layout-features='*' \
+    --glyph-names \
+    --symbol-cmap \
+    --legacy-cmap \
+    --notdef-glyph \
+    --notdef-outline \
+    --recommended-glyphs \
+    --name-legacy \
+    --drop-tables= \
+    --name-IDs='*' \
+    --name-languages='*'",
+  etcArgs: ""
+};
+
+function getOption(options: Partial<fontRangeOptionI>, key: keyof fontRangeOptionI, alterValue: ValueOf<fontRangeOptionI>) {
+  return options.hasOwnProperty(key)
+    ? options[key]
+    : alterValue;
+}
+
+export function fontRange(
+  url = targets.korean, fontPath = "",
+  fontRangeOption?: fontRangeOptionI['savePath'] | Partial<fontRangeOptionI>
+): Promise<Buffer[]> {
+  const options = Object.assign(
+    defaultOptions,
+    typeof(fontRangeOption) === 'string'
+      ? { savePath: fontRangeOption }
+      : fontRangeOption
+  );
+
+  const format   = options.format;
   const pathInfo = parse(fontPath);
   const fontDir  = pathInfo.dir;
   const fontName = pathInfo.name;
   const fontExt  = formatOption(format);
 
-  const dirPath  = (savePath === undefined) ? fontDir : savePath;
+  const dirPath  = getOption(options, 'savePath', fontDir);
   const ranges   = getUnicodeRanges(dirPath, url);
 
   const convertOption = formatOption(format, false);
-  const defautOptions = "--layout-features='*' \
-  --glyph-names \
-  --symbol-cmap \
-  --legacy-cmap \
-  --notdef-glyph \
-  --notdef-outline \
-  --recommended-glyphs \
-  --name-legacy \
-  --drop-tables= \
-  --name-IDs='*' \
-  --name-languages='*'";
+  const defaultOption = options.defaultArgs;
+  const etcOption     = options.etcArgs;
 
   return ranges.then(eachRanges => eachRanges.map((unicodes, i) => {
     const saveOption = "--output-file='" +
@@ -182,7 +213,7 @@ export function fontRange(url = targets.korean, fontPath = "", savePath?: string
     const unicodeOption = "--unicodes='" + unicodeRanges + "' ";
 
     const options = " '" + fontPath + "' " + saveOption + unicodeOption
-      + convertOption + defautOptions;
+      + convertOption + defaultOption + etcOption;
     return execSync("pyftsubset" + options);
   }));
 }

@@ -21,10 +21,31 @@ Google font `CSS file`(include `unicode-range` file) url and `font path` are fin
 
 ```js
 fontRange(google_font_css_url, font_path);
-fontRange(google_font_css_url, font_path, save_path, format); // Options
+fontRange(google_font_css_url, font_path, save_path); // Option1
+fontRange(google_font_css_url, font_path, {
+  savePath: "<SAVE SUBSET PATH>",
+  format: "<FONT FORMAT>",
+  defaultArgs: "<Default Args>",
+  etcArgs: "<ETC pyftsubset args>"
+}); // Option2
 ```
 - `save_path`'s default: `font_path`
 - `format`'s default: `woff2`
+- `defaultArgs`'s default:
+```
+--layout-features='*' \
+--glyph-names \
+--symbol-cmap \
+--legacy-cmap \
+--notdef-glyph \
+--notdef-outline \
+--recommended-glyphs \
+--name-legacy \
+--drop-tables= \
+--name-IDs='*' \
+--name-languages='*'
+```
+- `etcArgs`'s default: `""`
 
 ### Requires
 It has dependencies on the following packages:
