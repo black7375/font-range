@@ -160,7 +160,7 @@ function getDefaultOptions(): RequiredByValueExcept<fontRangeOptionI, 'savePath'
 }
 
 function getOption(options: Partial<fontRangeOptionI>, key: keyof fontRangeOptionI, alterValue: ValueOf<fontRangeOptionI>) {
-  return options.hasOwnProperty(key)
+  return Object.prototype.hasOwnProperty.call(options, key)
     ? options[key]
     : alterValue;
 }
