@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: '0'
     - uses: volta-cli/action@v1
     - name: pip cache
       uses: actions/cache@v2
@@ -41,6 +43,7 @@ jobs:
     - name: Commit Build File
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
+        branch: master
         file_pattern: build/src/*.js build/src/*.js.map
         commit_message: 'Fix: Automated apply build files'
         status_options: '--untracked-files=no'
