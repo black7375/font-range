@@ -3,6 +3,7 @@ import { createReadStream, createWriteStream, existsSync, mkdirSync } from 'fs';
 import fetch, { Headers } from 'node-fetch';
 import { parse as parseCSS, ParseOptions } from 'css-tree';
 import { execSync } from 'child_process';
+import { RequiredByValueExcept, ValueOf } from './types';
 
 // == Resouce Basics ==========================================================
 export const targets = {
@@ -21,10 +22,28 @@ function getFontName(url: string) {
   return fontName;
 }
 
+// https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
+function validURL(str: string) {
+  const pattern = new RegExp("^(https?:\\/\\/)?"+       // protocol
+    "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|"+ // domain name
+    "((\\d{1,3}\\.){3}\\d{1,3}))"+                      // OR ip (v4) address
+    "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*"+                  // port and path
+    "(\\?[;&a-z\\d%_.~+=-]*)?"+                         // query string
+    "(\\#[-a-z\\d_]*)?$","i");                          // fragment locator
+  return !!pattern.test(str);
+}
+
 function getCSSPath(dirPath: string, url: string) {
-  const fontName = getFontName(url);
-  const cssPath  = join(dirPath, fontName + ".css");
-  return cssPath;
+  if (validURL(url)) {
+    const fontName = getFontName(url);
+    const cssPath  = join(dirPath, fontName + ".css");
+    return cssPath;
+  }
+
+  if (!existsSync(url)) {
+    throw new Error(url + "Not vaild URL or PATH");
+  }
+  return url;
 }
 
 // == CSS I/O ==================================================================
@@ -112,6 +131,47 @@ export async function getUnicodeRanges(dirPath = "src", url = targets.korean): P
   return parseUnicodeRanges(ast);
 }
 
+// == Options =================================================================
+interface fontRangeOptionI {
+  savePath:    string;
+  format:      string;
+  nameFormat:  string;
+  defaultArgs: string;
+  etcArgs:     string;
+}
+
+function getDefaultOptions(): RequiredByValueExcept<fontRangeOptionI, 'savePath'> {
+  return {
+    format:      "woff2",
+    nameFormat:  "{NAME}_{INDEX}{EXT}",
+    defaultArgs: "--layout-features='*' \
+                  --glyph-names \
+                  --symbol-cmap \
+                  --legacy-cmap \
+                  --notdef-glyph \
+                  --notdef-outline \
+                  --recommended-glyphs \
+                  --name-legacy \
+                  --drop-tables= \
+                  --name-IDs='*' \
+                  --name-languages='*'",
+    etcArgs:      ""
+  };
+}
+
+function getOption(options: Partial<fontRangeOptionI>, key: keyof fontRangeOptionI, alterValue: ValueOf<fontRangeOptionI>) {
+  return Object.prototype.hasOwnProperty.call(options, key)
+    ? options[key]
+    : alterValue;
+}
+
+function getName(nameFormat: string, fontName: string, index: number, fontExt: string) {
+  return nameFormat
+    .replace( "{NAME}", fontName)
+    .replace("{INDEX}", index.toString())
+    .replace(  "{EXT}", fontExt);
+}
+
 // == Main ====================================================================
 function getFormat(format: string) {
   switch(format) {
@@ -134,37 +194,39 @@ function formatOption(format: string, ext = true) {
        : formatName + "' ");
 }
 
-export function fontRange(url = targets.korean, fontPath = "", savePath?: string,
-                          format = "woff2"): Promise<Buffer[]> {
+export function fontRange(
+  url = targets.korean, fontPath = "",
+  fontRangeOption?: fontRangeOptionI['savePath'] | Partial<fontRangeOptionI>
+): Promise<Buffer[]> {
+  const options = Object.assign(
+    getDefaultOptions(),
+    typeof(fontRangeOption) === 'string'
+      ? { savePath: fontRangeOption }
+      : fontRangeOption
+  );
+
+  const format   = options.format;
   const pathInfo = parse(fontPath);
   const fontDir  = pathInfo.dir;
   const fontName = pathInfo.name;
   const fontExt  = formatOption(format);
 
-  const dirPath  = (savePath === undefined) ? fontDir : savePath;
+  const dirPath  = getOption(options, 'savePath', fontDir);
   const ranges   = getUnicodeRanges(dirPath, url);
 
   const convertOption = formatOption(format, false);
-  const defautOptions = "--layout-features='*' \
-  --glyph-names \
-  --symbol-cmap \
-  --legacy-cmap \
-  --notdef-glyph \
-  --notdef-outline \
-  --recommended-glyphs \
-  --name-legacy \
-  --drop-tables= \
-  --name-IDs='*' \
-  --name-languages='*'";
+  const defaultOption = options.defaultArgs;
+  const etcOption     = options.etcArgs;
 
+  const nameFormat = options.nameFormat;
   return ranges.then(eachRanges => eachRanges.map((unicodes, i) => {
     const saveOption = "--output-file='" +
-      join(dirPath, fontName + "_" + i + fontExt) + "' ";
+      join(dirPath, getName(nameFormat, fontName, i, fontExt)) + "' ";
     const unicodeRanges = unicodes.split(', ').join(',');
     const unicodeOption = "--unicodes='" + unicodeRanges + "' ";
 
     const options = " '" + fontPath + "' " + saveOption + unicodeOption
-      + convertOption + defautOptions;
+      + convertOption + defaultOption + etcOption;
     return execSync("pyftsubset" + options);
   }));
 }

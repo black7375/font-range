@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: '0'
     - uses: volta-cli/action@v1
     - name: pip cache
       uses: actions/cache@v2
@@ -38,6 +40,13 @@ jobs:
       env:
         CI: true
     - run: npm test
+    - name: Commit Build File
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        branch: master
+        file_pattern: build/src/*.js build/src/*.js.map
+        commit_message: 'Fix: Automated apply build files'
+        status_options: '--untracked-files=no'
 
   publish:
     needs: build
@@ -60,10 +69,10 @@ jobs:
       if: matrix.branch == 'github-repo'
       uses: devmasx/merge-branch@1.4.0
       with:
-          type: now
-          from_branch: master
-          target_branch: github-repo
-          github_token: ${{ secrets[matrix.token] }}
+        type: now
+        from_branch: master
+        target_branch: github-repo
+        github_token: ${{ secrets[matrix.token] }}
     - uses: volta-cli/action@v1
     - uses: actions/setup-node@v1
       with:
