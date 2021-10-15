@@ -1,10 +1,13 @@
-import { __awaiter } from "tslib";
-import { join, parse } from 'path';
-import { createReadStream, createWriteStream, existsSync, mkdirSync } from 'fs';
-import fetch, { Headers } from 'node-fetch';
-import { parse as parseCSS } from 'css-tree';
-import { execSync } from 'child_process';
-export const targets = {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.fontRange = exports.getUnicodeRanges = exports.targets = void 0;
+const tslib_1 = require("tslib");
+const path_1 = require("path");
+const fs_1 = require("fs");
+const node_fetch_1 = require("node-fetch");
+const css_tree_1 = require("css-tree");
+const child_process_1 = require("child_process");
+exports.targets = {
     weston: "https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap",
     korean: "https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap",
     japanese: "https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap",
@@ -18,22 +21,37 @@ function getFontName(url) {
     const fontName = urlParams.get("family");
     return fontName;
 }
+function validURL(str) {
+    const pattern = new RegExp("^(https?:\\/\\/)?" +
+        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" +
+        "((\\d{1,3}\\.){3}\\d{1,3}))" +
+        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" +
+        "(\\?[;&a-z\\d%_.~+=-]*)?" +
+        "(\\#[-a-z\\d_]*)?$", "i");
+    return !!pattern.test(str);
+}
 function getCSSPath(dirPath, url) {
-    const fontName = getFontName(url);
-    const cssPath = join(dirPath, fontName + ".css");
-    return cssPath;
+    if (validURL(url)) {
+        const fontName = getFontName(url);
+        const cssPath = (0, path_1.join)(dirPath, fontName + ".css");
+        return cssPath;
+    }
+    if (!(0, fs_1.existsSync)(url)) {
+        throw new Error(url + "Not vaild URL or PATH");
+    }
+    return url;
 }
 function saveCSS(path, url) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const headers = new Headers({
+    return (0, tslib_1.__awaiter)(this, void 0, void 0, function* () {
+        const headers = new node_fetch_1.Headers({
             "Accept": "text/html,application/xhtml+xml,application/xml;",
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0"
         });
-        const res = yield fetch(url, {
+        const res = yield (0, node_fetch_1.default)(url, {
             method: "GET",
             headers: headers
         });
-        const fileStream = createWriteStream(path);
+        const fileStream = (0, fs_1.createWriteStream)(path);
         yield new Promise((resolve, reject) => {
             res.body.pipe(fileStream);
             res.body.on("error", (err) => {
@@ -47,14 +65,14 @@ function saveCSS(path, url) {
     });
 }
 function readCSS(path) {
-    return __awaiter(this, void 0, void 0, function* () {
+    return (0, tslib_1.__awaiter)(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
             const readData = [];
-            createReadStream(path)
+            (0, fs_1.createReadStream)(path)
                 .on('data', (data) => {
                 readData.push(data);
             })
-                .on('end', () => __awaiter(this, void 0, void 0, function* () {
+                .on('end', () => (0, tslib_1.__awaiter)(this, void 0, void 0, function* () {
                 yield Promise.all(readData);
                 const css = readData.join('');
                 resolve(css);
@@ -68,17 +86,17 @@ const parseOptions = {
     parseRulePrelude: false,
     parseValue: false
 };
-function loadAST(dirPath, url = targets.korean, parseOption = parseOptions) {
-    return __awaiter(this, void 0, void 0, function* () {
+function loadAST(dirPath, url = exports.targets.korean, parseOption = parseOptions) {
+    return (0, tslib_1.__awaiter)(this, void 0, void 0, function* () {
         const cssPath = getCSSPath(dirPath, url);
-        if (!existsSync(dirPath)) {
-            mkdirSync(dirPath);
+        if (!(0, fs_1.existsSync)(dirPath)) {
+            (0, fs_1.mkdirSync)(dirPath);
         }
-        if (!existsSync(cssPath)) {
+        if (!(0, fs_1.existsSync)(cssPath)) {
             yield saveCSS(cssPath, url);
         }
         const css = yield readCSS(cssPath);
-        const ast = yield parseCSS(css, parseOption);
+        const ast = yield (0, css_tree_1.parse)(css, parseOption);
         return ast;
     });
 }
@@ -96,11 +114,41 @@ function parseUnicodeRanges(parsed) {
     });
     return uniRanges;
 }
-export function getUnicodeRanges(dirPath = "src", url = targets.korean) {
-    return __awaiter(this, void 0, void 0, function* () {
+function getUnicodeRanges(dirPath = "src", url = exports.targets.korean) {
+    return (0, tslib_1.__awaiter)(this, void 0, void 0, function* () {
         const ast = yield loadAST(dirPath, url);
         return parseUnicodeRanges(ast);
     });
+}
+exports.getUnicodeRanges = getUnicodeRanges;
+function getDefaultOptions() {
+    return {
+        format: "woff2",
+        nameFormat: "{NAME}_{INDEX}{EXT}",
+        defaultArgs: "--layout-features='*' \
+                  --glyph-names \
+                  --symbol-cmap \
+                  --legacy-cmap \
+                  --notdef-glyph \
+                  --notdef-outline \
+                  --recommended-glyphs \
+                  --name-legacy \
+                  --drop-tables= \
+                  --name-IDs='*' \
+                  --name-languages='*'",
+        etcArgs: ""
+    };
+}
+function getOption(options, key, alterValue) {
+    return Object.prototype.hasOwnProperty.call(options, key)
+        ? options[key]
+        : alterValue;
+}
+function getName(nameFormat, fontName, index, fontExt) {
+    return nameFormat
+        .replace("{NAME}", fontName)
+        .replace("{INDEX}", index.toString())
+        .replace("{EXT}", fontExt);
 }
 function getFormat(format) {
     switch (format) {
@@ -122,33 +170,30 @@ function formatOption(format, ext = true) {
         ? formatName + "' --with-zopfli "
         : formatName + "' ");
 }
-export function fontRange(url = targets.korean, fontPath = "", savePath, format = "woff2") {
-    const pathInfo = parse(fontPath);
+function fontRange(url = exports.targets.korean, fontPath = "", fontRangeOption) {
+    const options = Object.assign(getDefaultOptions(), typeof (fontRangeOption) === 'string'
+        ? { savePath: fontRangeOption }
+        : fontRangeOption);
+    const format = options.format;
+    const pathInfo = (0, path_1.parse)(fontPath);
     const fontDir = pathInfo.dir;
     const fontName = pathInfo.name;
     const fontExt = formatOption(format);
-    const dirPath = (savePath === undefined) ? fontDir : savePath;
+    const dirPath = getOption(options, 'savePath', fontDir);
     const ranges = getUnicodeRanges(dirPath, url);
     const convertOption = formatOption(format, false);
-    const defautOptions = "--layout-features='*' \
-  --glyph-names \
-  --symbol-cmap \
-  --legacy-cmap \
-  --notdef-glyph \
-  --notdef-outline \
-  --recommended-glyphs \
-  --name-legacy \
-  --drop-tables= \
-  --name-IDs='*' \
-  --name-languages='*'";
+    const defaultOption = options.defaultArgs;
+    const etcOption = options.etcArgs;
+    const nameFormat = options.nameFormat;
     return ranges.then(eachRanges => eachRanges.map((unicodes, i) => {
         const saveOption = "--output-file='" +
-            join(dirPath, fontName + "_" + i + fontExt) + "' ";
+            (0, path_1.join)(dirPath, getName(nameFormat, fontName, i, fontExt)) + "' ";
         const unicodeRanges = unicodes.split(', ').join(',');
         const unicodeOption = "--unicodes='" + unicodeRanges + "' ";
         const options = " '" + fontPath + "' " + saveOption + unicodeOption
-            + convertOption + defautOptions;
-        return execSync("pyftsubset" + options);
+            + convertOption + defaultOption + etcOption;
+        return (0, child_process_1.execSync)("pyftsubset" + options);
     }));
 }
+exports.fontRange = fontRange;
 //# sourceMappingURL=main.js.map
