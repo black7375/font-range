@@ -1,7 +1,7 @@
 {
   "name": "font-range",
   "description": " Font subset with google font's ML result.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": "black7375 <alstjr7375@daum.net>",
   "license": "MIT",
   "keywords": [
@@ -43,6 +43,7 @@
     "typescript": "^4.4.5"
   },
   "main": "build/src/main.js",
+  "typings": "build/src/main.d.ts",
   "scripts": {
     "clean": "rimraf coverage build tmp",
     "build": "tsc -p tsconfig.release.json",
