@@ -44,7 +44,7 @@ jobs:
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
         branch: master
-        file_pattern: build/src/*.js build/src/*.js.map
+        file_pattern: build/src/*.js build/src/*.js.map build/src/*.d.ts
         commit_message: 'Fix: Automated apply build files'
         status_options: '--untracked-files=no'
 
