@@ -62,5 +62,6 @@
   "volta": {
     "node": "19.3.0",
     "npm": "9.2.0"
-  }
+  },
+  "packageManager": "yarn@3.3.1"
 }

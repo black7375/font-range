@@ -23,20 +23,8 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-    - name: node cache
-      id: node-cache
-      uses: actions/cache@v3
-      with:
-        path: node_modules
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
     - run: pip install -r ./requirements.txt
-    - name: npm install
-      if: steps.node-cache.outputs.cache-hit != 'true'
-      run: npm install
-    - run: npm ci --no-audit
-    - run: npm run build --if-present
+    - run: yarn run build --if-present
       env:
         CI: true
     - run: npm test
@@ -85,22 +73,11 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-    - name: node cache
-      id: node-cache
-      uses: actions/cache@v3
-      with:
-        path: node_modules
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
     - run: pip install -r ./requirements.txt
-    - name: npm install
-      if: steps.node-cache.outputs.cache-hit != 'true'
-      run: npm install
-    - run: npm ci
-    - run: npm run build --if-present
+    - run: yarn build
       env:
         CI: true
-    - run: npm publish
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets[matrix.token] }}
+    - name: npm publish
+      run: |
+        yarn config set npmAuthToken ${{ secrets[matrix.token] }}
+        yarn run publish
