@@ -12,12 +12,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: '0'
-    - uses: volta-cli/action@v1
+    - uses: volta-cli/action@v3
     - name: pip cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -25,7 +25,7 @@ jobs:
           ${{ runner.os }}-pip-
     - name: node cache
       id: node-cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: node_modules
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -62,7 +62,7 @@ jobs:
             token: GITHUB_TOKEN
             registry: https://npm.pkg.github.com/
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         ref: ${{ matrix.branch }}
     - name: Merge master -> github-repo
@@ -73,13 +73,13 @@ jobs:
         from_branch: master
         target_branch: github-repo
         github_token: ${{ secrets[matrix.token] }}
-    - uses: volta-cli/action@v1
-    - uses: actions/setup-node@v1
+    - uses: volta-cli/action@v3
+    - uses: actions/setup-node@v3
       with:
         registry-url: ${{ matrix.registry }}
     - name: pip cache
       id: pip-cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -87,7 +87,7 @@ jobs:
           ${{ runner.os }}-pip-
     - name: node cache
       id: node-cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: node_modules
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}

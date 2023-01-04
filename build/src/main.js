@@ -42,10 +42,10 @@ function getCSSPath(dirPath, url) {
     return url;
 }
 function saveCSS(path, url) {
-    return (0, tslib_1.__awaiter)(this, void 0, void 0, function* () {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const headers = new node_fetch_1.Headers({
             "Accept": "text/html,application/xhtml+xml,application/xml;",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/78.0"
         });
         const res = yield (0, node_fetch_1.default)(url, {
             method: "GET",
@@ -65,14 +65,14 @@ function saveCSS(path, url) {
     });
 }
 function readCSS(path) {
-    return (0, tslib_1.__awaiter)(this, void 0, void 0, function* () {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
             const readData = [];
             (0, fs_1.createReadStream)(path)
                 .on('data', (data) => {
                 readData.push(data);
             })
-                .on('end', () => (0, tslib_1.__awaiter)(this, void 0, void 0, function* () {
+                .on('end', () => tslib_1.__awaiter(this, void 0, void 0, function* () {
                 yield Promise.all(readData);
                 const css = readData.join('');
                 resolve(css);
@@ -87,7 +87,7 @@ const parseOptions = {
     parseValue: false
 };
 function loadAST(dirPath, url = exports.targets.korean, parseOption = parseOptions) {
-    return (0, tslib_1.__awaiter)(this, void 0, void 0, function* () {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const cssPath = getCSSPath(dirPath, url);
         if (!(0, fs_1.existsSync)(dirPath)) {
             (0, fs_1.mkdirSync)(dirPath);
@@ -115,7 +115,7 @@ function parseUnicodeRanges(parsed) {
     return uniRanges;
 }
 function getUnicodeRanges(dirPath = "src", url = exports.targets.korean) {
-    return (0, tslib_1.__awaiter)(this, void 0, void 0, function* () {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const ast = yield loadAST(dirPath, url);
         return parseUnicodeRanges(ast);
     });

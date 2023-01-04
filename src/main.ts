@@ -51,7 +51,7 @@ async function saveCSS(path: string, url: string) {
   // Fake header
   const headers = new Headers({
     "Accept": "text/html,application/xhtml+xml,application/xml;",
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/78.0"
   });
 
   const res = await fetch(url, {
