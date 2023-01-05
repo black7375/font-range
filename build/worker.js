@@ -5,4 +5,3 @@ function subset(options) {
     return (0, child_process_1.execSync)("pyftsubset" + options);
 }
 exports.default = subset;
-//# sourceMappingURL=worker.js.map

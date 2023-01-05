@@ -18,7 +18,7 @@ class Worker {
   public static getInstance(): Piscina {
     if(!Worker.instance) {
       Worker.instance = new Piscina({
-        filename: join(process.cwd(), "build", "src", "worker.js")
+        filename: join(process.cwd(), "build", "worker.js")
       });
     }
     return Worker.instance;

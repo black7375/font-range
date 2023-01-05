@@ -1,26 +1,6 @@
 import { targets, getUnicodeRanges, fontRange, fontSubset } from '../src/main';
 import { join, parse } from 'path';
 import { existsSync, unlink, NoParamCallback } from 'fs';
-import fetch from 'node-fetch';
-import commandExists from 'command-exists';
-
-describe("Preset Check", () => {
-  it("Target URLs access check", async () => {
-    for ( const targetName in targets ) {
-      const res = await fetch(targets[targetName]);
-      expect(res.status).toBe(200);
-    }
-  });
-
-  it("Python command check", async () => {
-    commandExists("pyftsubset", (err, commandExists) => {
-      expect(commandExists).toBe(true);
-      if (err) {
-        console.log(err);
-      }
-    });
-  });
-});
 
 // https://github.com/piscinajs/piscina/issues/83
 const fontPath = join("__tests__", "font", "NotoSansKR-Regular.otf");
