@@ -15,7 +15,6 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: '0'
-    - uses: volta-cli/action@v3
     - name: pip cache
       uses: actions/cache@v3
       with:
@@ -24,10 +23,10 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-
     - run: pip install -r ./requirements.txt
-    - run: yarn run build --if-present
+    - run: yarn build
       env:
         CI: true
-    - run: npm test
+    - run: yarn test
     - name: Commit Build File
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
@@ -61,7 +60,6 @@ jobs:
         from_branch: master
         target_branch: github-repo
         github_token: ${{ secrets[matrix.token] }}
-    - uses: volta-cli/action@v3
     - uses: actions/setup-node@v3
       with:
         registry-url: ${{ matrix.registry }}

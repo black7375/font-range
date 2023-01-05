@@ -7,7 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: volta-cli/action@v3
     - name: pip cache
       id: pip-cache
       uses: actions/cache@v3
@@ -17,8 +16,8 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-
     - run: pip install -r ./requirements.txt
-    - run: yarn run lint --if-present
+    - run: yarn run lint
     - run: yarn test
-    - run: yarn run build --if-present
+    - run: yarn run build
       env:
         CI: true
