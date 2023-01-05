@@ -28,6 +28,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         [null, {\
           "packageLocation": "./",\
           "packageDependencies": [\
+            ["@types/command-exists", "npm:1.2.0"],\
             ["@types/css-tree", "npm:2.0.1"],\
             ["@types/jest", "npm:29.2.5"],\
             ["@types/node", "npm:18.11.18"],\
@@ -1373,6 +1374,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@types-color-name-npm-1.1.1-00b0925070-b71fcad728.zip/node_modules/@types/color-name/",\
           "packageDependencies": [\
             ["@types/color-name", "npm:1.1.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@types/command-exists", [\
+        ["npm:1.2.0", {\
+          "packageLocation": "./.yarn/cache/@types-command-exists-npm-1.2.0-9c4b80a9f8-7c5a626c38.zip/node_modules/@types/command-exists/",\
+          "packageDependencies": [\
+            ["@types/command-exists", "npm:1.2.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -3022,6 +3032,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",\
           "packageDependencies": [\
             ["font-range", "workspace:."],\
+            ["@types/command-exists", "npm:1.2.0"],\
             ["@types/css-tree", "npm:2.0.1"],\
             ["@types/jest", "npm:29.2.5"],\
             ["@types/node", "npm:18.11.18"],\

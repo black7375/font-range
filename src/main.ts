@@ -82,8 +82,7 @@ async function readCSS(path: string) {
       .on("data", (data) => {
         readData.push(data);
       })
-      .on("end", async () => {
-        await Promise.all(readData);
+      .on("end", () => {
         const css = readData.join("");
 
         resolve(css);

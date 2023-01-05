@@ -5,7 +5,7 @@ const tslib_1 = require("tslib");
 const path_1 = require("path");
 const fs_1 = require("fs");
 const promises_1 = require("fs/promises");
-const node_fetch_1 = require("node-fetch");
+const node_fetch_1 = tslib_1.__importStar(require("node-fetch"));
 const css_tree_1 = require("css-tree");
 const child_process_1 = require("child_process");
 exports.targets = {
@@ -74,11 +74,10 @@ function readCSS(path) {
                 .on("data", (data) => {
                 readData.push(data);
             })
-                .on("end", () => tslib_1.__awaiter(this, void 0, void 0, function* () {
-                yield Promise.all(readData);
+                .on("end", () => {
                 const css = readData.join("");
                 resolve(css);
-            }))
+            })
                 .on("error", reject);
         });
     });

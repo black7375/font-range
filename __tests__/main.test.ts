@@ -2,6 +2,7 @@ import { targets, getUnicodeRanges, fontRange } from '../src/main';
 import { join, parse } from 'path';
 import { existsSync, unlink, NoParamCallback } from 'fs';
 import fetch from 'node-fetch';
+import commandExists from 'command-exists';
 
 describe("Preset Check", () => {
   it("Target URLs access check", async () => {
@@ -12,7 +13,6 @@ describe("Preset Check", () => {
   });
 
   it("Python command check", async () => {
-    const commandExists = await import("command-exists");
     commandExists("pyftsubset", (err, commandExists) => {
       expect(commandExists).toBe(true);
       if (err) {
