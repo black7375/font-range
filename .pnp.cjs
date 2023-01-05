@@ -42,6 +42,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-plugin-jest", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:27.2.0"],\
             ["jest", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:29.3.1"],\
             ["node-fetch", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:2.6.7"],\
+            ["piscina", "npm:3.2.0"],\
             ["prettier", "npm:2.8.1"],\
             ["rimraf", "npm:3.0.2"],\
             ["ts-jest", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:29.0.3"],\
@@ -59,6 +60,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@ampproject/remapping", "npm:2.2.0"],\
             ["@jridgewell/gen-mapping", "npm:0.1.1"],\
             ["@jridgewell/trace-mapping", "npm:0.3.17"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@assemblyscript/loader", [\
+        ["npm:0.10.1", {\
+          "packageLocation": "./.yarn/cache/@assemblyscript-loader-npm-0.10.1-d72c90e01a-fd1f57bdf2.zip/node_modules/@assemblyscript/loader/",\
+          "packageDependencies": [\
+            ["@assemblyscript/loader", "npm:0.10.1"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -2073,6 +2083,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["base64-js", [\
+        ["npm:1.5.1", {\
+          "packageLocation": "./.yarn/cache/base64-js-npm-1.5.1-b2f7275641-669632eb37.zip/node_modules/base64-js/",\
+          "packageDependencies": [\
+            ["base64-js", "npm:1.5.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["brace-expansion", [\
         ["npm:1.1.11", {\
           "packageLocation": "./.yarn/cache/brace-expansion-npm-1.1.11-fb95eb05ad-faf34a7bb0.zip/node_modules/brace-expansion/",\
@@ -2865,6 +2884,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["eventemitter-asyncresource", [\
+        ["npm:1.0.0", {\
+          "packageLocation": "./.yarn/cache/eventemitter-asyncresource-npm-1.0.0-de223b5f00-3cfbbc3490.zip/node_modules/eventemitter-asyncresource/",\
+          "packageDependencies": [\
+            ["eventemitter-asyncresource", "npm:1.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["execa", [\
         ["npm:5.1.1", {\
           "packageLocation": "./.yarn/cache/execa-npm-5.1.1-191347acf5-fba9022c8c.zip/node_modules/execa/",\
@@ -3046,6 +3074,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-plugin-jest", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:27.2.0"],\
             ["jest", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:29.3.1"],\
             ["node-fetch", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:2.6.7"],\
+            ["piscina", "npm:3.2.0"],\
             ["prettier", "npm:2.8.1"],\
             ["rimraf", "npm:3.0.2"],\
             ["ts-jest", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:29.0.3"],\
@@ -3285,6 +3314,27 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/has-unicode-npm-2.0.1-893adb4747-1eab07a743.zip/node_modules/has-unicode/",\
           "packageDependencies": [\
             ["has-unicode", "npm:2.0.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["hdr-histogram-js", [\
+        ["npm:2.0.3", {\
+          "packageLocation": "./.yarn/cache/hdr-histogram-js-npm-2.0.3-2b1e3eb2a6-7bb252ba35.zip/node_modules/hdr-histogram-js/",\
+          "packageDependencies": [\
+            ["hdr-histogram-js", "npm:2.0.3"],\
+            ["@assemblyscript/loader", "npm:0.10.1"],\
+            ["base64-js", "npm:1.5.1"],\
+            ["pako", "npm:1.0.11"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["hdr-histogram-percentiles-obj", [\
+        ["npm:3.0.0", {\
+          "packageLocation": "./.yarn/cache/hdr-histogram-percentiles-obj-npm-3.0.0-08d46127d8-ab238edcb3.zip/node_modules/hdr-histogram-percentiles-obj/",\
+          "packageDependencies": [\
+            ["hdr-histogram-percentiles-obj", "npm:3.0.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -4590,6 +4640,28 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["nice-napi", [\
+        ["npm:1.0.2", {\
+          "packageLocation": "./.yarn/unplugged/nice-napi-npm-1.0.2-693b1680c9/node_modules/nice-napi/",\
+          "packageDependencies": [\
+            ["nice-napi", "npm:1.0.2"],\
+            ["node-addon-api", "npm:3.2.1"],\
+            ["node-gyp", "npm:9.3.1"],\
+            ["node-gyp-build", "npm:4.5.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["node-addon-api", [\
+        ["npm:3.2.1", {\
+          "packageLocation": "./.yarn/unplugged/node-addon-api-npm-3.2.1-a29528f81d/node_modules/node-addon-api/",\
+          "packageDependencies": [\
+            ["node-addon-api", "npm:3.2.1"],\
+            ["node-gyp", "npm:9.3.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["node-fetch", [\
         ["npm:2.6.7", {\
           "packageLocation": "./.yarn/cache/node-fetch-npm-2.6.7-777aa2a6df-8d816ffd1e.zip/node_modules/node-fetch/",\
@@ -4628,6 +4700,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["semver", "npm:7.3.8"],\
             ["tar", "npm:6.1.13"],\
             ["which", "npm:2.0.2"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["node-gyp-build", [\
+        ["npm:4.5.0", {\
+          "packageLocation": "./.yarn/cache/node-gyp-build-npm-4.5.0-2538da6152-d888bae0fb.zip/node_modules/node-gyp-build/",\
+          "packageDependencies": [\
+            ["node-gyp-build", "npm:4.5.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -4782,6 +4863,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["pako", [\
+        ["npm:1.0.11", {\
+          "packageLocation": "./.yarn/cache/pako-npm-1.0.11-b8f1b69d3e-1be2bfa1f8.zip/node_modules/pako/",\
+          "packageDependencies": [\
+            ["pako", "npm:1.0.11"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["parent-module", [\
         ["npm:1.0.1", {\
           "packageLocation": "./.yarn/cache/parent-module-npm-1.0.1-1fae11b095-6ba8b25514.zip/node_modules/parent-module/",\
@@ -4873,6 +4963,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/pirates-npm-4.0.5-22f8e827ce-c9994e61b8.zip/node_modules/pirates/",\
           "packageDependencies": [\
             ["pirates", "npm:4.0.5"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["piscina", [\
+        ["npm:3.2.0", {\
+          "packageLocation": "./.yarn/cache/piscina-npm-3.2.0-bab8ec26c3-c1980c7d45.zip/node_modules/piscina/",\
+          "packageDependencies": [\
+            ["piscina", "npm:3.2.0"],\
+            ["eventemitter-asyncresource", "npm:1.0.0"],\
+            ["hdr-histogram-js", "npm:2.0.3"],\
+            ["hdr-histogram-percentiles-obj", "npm:3.0.0"],\
+            ["nice-napi", "npm:1.0.2"]\
           ],\
           "linkType": "HARD"\
         }]\

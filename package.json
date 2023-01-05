@@ -58,6 +58,7 @@
     "@types/node-fetch": "^2.6.2",
     "css-tree": "^2.3.1",
     "node-fetch": "^2.6.7",
+    "piscina": "^3.2.0",
     "tslib": "^2.4.1"
   },
   "volta": {

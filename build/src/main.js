@@ -7,7 +7,18 @@ const fs_1 = require("fs");
 const promises_1 = require("fs/promises");
 const node_fetch_1 = tslib_1.__importStar(require("node-fetch"));
 const css_tree_1 = require("css-tree");
-const child_process_1 = require("child_process");
+const piscina_1 = tslib_1.__importDefault(require("piscina"));
+class Worker {
+    constructor() { }
+    static getInstance() {
+        if (!Worker.instance) {
+            Worker.instance = new piscina_1.default({
+                filename: (0, path_1.join)(process.cwd(), "build", "src", "worker.js")
+            });
+        }
+        return Worker.instance;
+    }
+}
 exports.targets = {
     weston: "https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap",
     korean: "https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap",
@@ -169,29 +180,35 @@ function formatOption(format, ext = true) {
         : formatName + "' ");
 }
 function fontRange(url = exports.targets.korean, fontPath = "", fontRangeOption) {
-    const options = Object.assign(getDefaultOptions(), typeof (fontRangeOption) === 'string'
-        ? { savePath: fontRangeOption }
-        : fontRangeOption);
-    const format = options.format;
-    const pathInfo = (0, path_1.parse)(fontPath);
-    const fontDir = pathInfo.dir;
-    const fontName = pathInfo.name;
-    const fontExt = formatOption(format);
-    const dirPath = getOption(options, 'savePath', fontDir);
-    const ranges = getUnicodeRanges(dirPath, url);
-    const convertOption = formatOption(format, false);
-    const defaultOption = options.defaultArgs;
-    const etcOption = options.etcArgs;
-    const nameFormat = options.nameFormat;
-    return ranges.then(eachRanges => eachRanges.map((unicodes, i) => {
-        const saveOption = "--output-file='" +
-            (0, path_1.join)(dirPath, getName(nameFormat, fontName, i, fontExt)) + "' ";
-        const unicodeRanges = unicodes.split(', ').join(',');
-        const unicodeOption = "--unicodes='" + unicodeRanges + "' ";
-        const options = " '" + fontPath + "' " + saveOption + unicodeOption
-            + convertOption + defaultOption + etcOption;
-        return (0, child_process_1.execSync)("pyftsubset" + options);
-    }));
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const options = Object.assign(getDefaultOptions(), typeof (fontRangeOption) === 'string'
+            ? { savePath: fontRangeOption }
+            : fontRangeOption);
+        const worker = Worker.getInstance();
+        const format = options.format;
+        const pathInfo = (0, path_1.parse)(fontPath);
+        const fontDir = pathInfo.dir;
+        const fontName = pathInfo.name;
+        const fontExt = formatOption(format);
+        const dirPath = getOption(options, 'savePath', fontDir);
+        const ranges = getUnicodeRanges(dirPath, url);
+        const convertOption = formatOption(format, false);
+        const defaultOption = options.defaultArgs;
+        const etcOption = options.etcArgs;
+        const nameFormat = options.nameFormat;
+        const eachRanges = yield ranges;
+        const result = eachRanges.map((unicodes, i) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const saveOption = "--output-file='" +
+                (0, path_1.join)(dirPath, getName(nameFormat, fontName, i, fontExt)) + "' ";
+            const unicodeRanges = unicodes.split(', ').join(',');
+            const unicodeOption = "--unicodes='" + unicodeRanges + "' ";
+            const options = " '" + fontPath + "' " + saveOption + unicodeOption
+                + convertOption + defaultOption + etcOption;
+            const result = yield worker.run(options);
+            return result;
+        }));
+        return Promise.all(result);
+    });
 }
 exports.fontRange = fontRange;
 //# sourceMappingURL=main.js.map

@@ -4,8 +4,26 @@ import { mkdir } from 'fs/promises';
 import fetch, { Headers } from 'node-fetch';
 import { parse as parseCSS, ParseOptions, findAll } from 'css-tree';
 import type { Declaration } from 'css-tree';
-import { execSync } from 'child_process';
-import { RequiredByValueExcept, ValueOf } from './types';
+import Piscina from 'piscina';
+import type { RequiredByValueExcept, ValueOf } from './types';
+import type WorkerFn from './worker';
+
+// == Worker ==================================================================
+type WorkerRT = ReturnType<typeof WorkerFn>;
+
+class Worker {
+  private static instance: Piscina;
+  private constructor() { }
+
+  public static getInstance(): Piscina {
+    if(!Worker.instance) {
+      Worker.instance = new Piscina({
+        filename: join(process.cwd(), "build", "src", "worker.js")
+      });
+    }
+    return Worker.instance;
+  }
+}
 
 // == Resouce Basics ==========================================================
 export const targets = {
@@ -194,16 +212,17 @@ function formatOption(format: string, ext = true) {
        : formatName + "' ");
 }
 
-export function fontRange(
+export async function fontRange(
   url = targets.korean, fontPath = "",
   fontRangeOption?: fontRangeOptionI['savePath'] | Partial<fontRangeOptionI>
-): Promise<Buffer[]> {
+) {
   const options = Object.assign(
     getDefaultOptions(),
     typeof(fontRangeOption) === 'string'
       ? { savePath: fontRangeOption }
       : fontRangeOption
   );
+  const worker  = Worker.getInstance();
 
   const format   = options.format;
   const pathInfo = parse(fontPath);
@@ -219,7 +238,8 @@ export function fontRange(
   const etcOption     = options.etcArgs;
 
   const nameFormat = options.nameFormat;
-  return ranges.then(eachRanges => eachRanges.map((unicodes, i) => {
+  const eachRanges = await ranges;
+  const result     = eachRanges.map(async (unicodes, i) => {
     const saveOption = "--output-file='" +
       join(dirPath, getName(nameFormat, fontName, i, fontExt)) + "' ";
     const unicodeRanges = unicodes.split(', ').join(',');
@@ -227,6 +247,9 @@ export function fontRange(
 
     const options = " '" + fontPath + "' " + saveOption + unicodeOption
       + convertOption + defaultOption + etcOption;
-    return execSync("pyftsubset" + options);
-  }));
+    const result: WorkerRT = await worker.run(options);
+    return result;
+  });
+
+  return Promise.all(result);
 }

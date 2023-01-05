@@ -32,14 +32,15 @@ const errCallback: NoParamCallback = (err) => {
     return;
   }
 }
+const timeout = 60000;
 
 describe("FontRange Offline Feature", () => {
   const cssPath = join("__tests__", "font", "NotoSansKR-Local.css");
-  beforeAll(() => {
-    return fontRange(cssPath, fontPath, {
+  beforeAll(async () => {
+    return await fontRange(cssPath, fontPath, {
       nameFormat: "{NAME}.subset.{INDEX}{EXT}"
     });
-  });
+  }, timeout);
 
   it("Font Created Check", async () => {
     const ranges  = await getUnicodeRanges(fontDir, cssPath);
@@ -55,9 +56,9 @@ describe("FontRange Offline Feature", () => {
 });
 
 describe("FontRange Online Feature", () => {
-  beforeAll(() => {
-    return fontRange(targets.korean, fontPath);
-  });
+  beforeAll(async () => {
+    return await fontRange(targets.korean, fontPath);
+  }, timeout);
 
   it("Check CSS Download", () => {
     const cssPath = join(fontDir, "Noto Sans KR.css");
