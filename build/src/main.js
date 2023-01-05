@@ -4,6 +4,7 @@ exports.fontRange = exports.getUnicodeRanges = exports.targets = void 0;
 const tslib_1 = require("tslib");
 const path_1 = require("path");
 const fs_1 = require("fs");
+const promises_1 = require("fs/promises");
 const node_fetch_1 = require("node-fetch");
 const css_tree_1 = require("css-tree");
 const child_process_1 = require("child_process");
@@ -43,9 +44,10 @@ function getCSSPath(dirPath, url) {
 }
 function saveCSS(path, url) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const version = "109.0";
         const headers = new node_fetch_1.Headers({
             "Accept": "text/html,application/xhtml+xml,application/xml;",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/78.0"
+            "User-Agent": `Mozilla/5.0 (Windows NT 10.0; rv:${version}) Gecko/20100101 Firefox/${version}`
         });
         const res = yield (0, node_fetch_1.default)(url, {
             method: "GET",
@@ -55,7 +57,7 @@ function saveCSS(path, url) {
         yield new Promise((resolve, reject) => {
             res.body.pipe(fileStream);
             res.body.on("error", (err) => {
-                console.log('File write Error.');
+                console.log("File write Error.");
                 reject(err);
             });
             fileStream.on("finish", function () {
@@ -69,15 +71,15 @@ function readCSS(path) {
         return new Promise((resolve, reject) => {
             const readData = [];
             (0, fs_1.createReadStream)(path)
-                .on('data', (data) => {
+                .on("data", (data) => {
                 readData.push(data);
             })
-                .on('end', () => tslib_1.__awaiter(this, void 0, void 0, function* () {
+                .on("end", () => tslib_1.__awaiter(this, void 0, void 0, function* () {
                 yield Promise.all(readData);
-                const css = readData.join('');
+                const css = readData.join("");
                 resolve(css);
             }))
-                .on('error', reject);
+                .on("error", reject);
         });
     });
 }
@@ -90,34 +92,31 @@ function loadAST(dirPath, url = exports.targets.korean, parseOption = parseOptio
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const cssPath = getCSSPath(dirPath, url);
         if (!(0, fs_1.existsSync)(dirPath)) {
-            (0, fs_1.mkdirSync)(dirPath);
+            yield (0, promises_1.mkdir)(dirPath);
         }
         if (!(0, fs_1.existsSync)(cssPath)) {
             yield saveCSS(cssPath, url);
         }
         const css = yield readCSS(cssPath);
-        const ast = yield (0, css_tree_1.parse)(css, parseOption);
+        const ast = (0, css_tree_1.parse)(css, parseOption);
         return ast;
     });
-}
-function parseUnicodeRanges(parsed) {
-    const fontFaceL = parsed.children;
-    const uniRangeL = fontFaceL.map((faceValObj => {
-        const faceBlockL = faceValObj.block.children;
-        const uniRangeBlockL = faceBlockL.filter(faceBlock => faceBlock.property === "unicode-range");
-        const uniRangeL = uniRangeBlockL.map(uniRangeBlock => uniRangeBlock.value.value);
-        return uniRangeL.head.data;
-    }));
-    const uniRanges = [];
-    uniRangeL.forEach(unicodeRange => {
-        uniRanges.push(unicodeRange);
-    });
-    return uniRanges;
 }
 function getUnicodeRanges(dirPath = "src", url = exports.targets.korean) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const ast = yield loadAST(dirPath, url);
-        return parseUnicodeRanges(ast);
+        const unicodeNodes = (0, css_tree_1.findAll)(ast, (node, _item, _list) => {
+            return (node.type === "Declaration" &&
+                node.property === "unicode-range");
+        });
+        const unicodeRanges = unicodeNodes.reduce((unicodeRanges, node) => {
+            const nodeValue = node.value;
+            if (nodeValue.type === "Raw") {
+                unicodeRanges.push(nodeValue.value);
+            }
+            return unicodeRanges;
+        }, []);
+        return unicodeRanges;
     });
 }
 exports.getUnicodeRanges = getUnicodeRanges;
