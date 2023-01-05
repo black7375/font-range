@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fontRange = exports.getUnicodeRanges = exports.targets = void 0;
+exports.fontSubset = exports.fontRange = exports.getUnicodeRanges = exports.targets = void 0;
 const tslib_1 = require("tslib");
 const path_1 = require("path");
 const fs_1 = require("fs");
@@ -148,17 +148,6 @@ function getDefaultOptions() {
         etcArgs: ""
     };
 }
-function getOption(options, key, alterValue) {
-    return Object.prototype.hasOwnProperty.call(options, key)
-        ? options[key]
-        : alterValue;
-}
-function getName(nameFormat, fontName, index, fontExt) {
-    return nameFormat
-        .replace("{NAME}", fontName)
-        .replace("{INDEX}", index.toString())
-        .replace("{EXT}", fontExt);
-}
 function getFormat(format) {
     switch (format) {
         case "otf": return "otf";
@@ -179,31 +168,66 @@ function formatOption(format, ext = true) {
         ? formatName + "' --with-zopfli "
         : formatName + "' ");
 }
+function getOption(options, key, alterValue) {
+    return Object.prototype.hasOwnProperty.call(options, key)
+        ? options[key]
+        : alterValue;
+}
+function getOptionInfos(fontPath = "", fontOption) {
+    const options = Object.assign(getDefaultOptions(), typeof (fontOption) === "string"
+        ? { savePath: fontOption }
+        : fontOption);
+    const format = options.format;
+    const pathInfo = (0, path_1.parse)(fontPath);
+    const fontDir = pathInfo.dir;
+    const fontName = pathInfo.name;
+    const fontExt = formatOption(format);
+    const dirPath = getOption(options, "savePath", fontDir);
+    const nameFormat = options.nameFormat;
+    const convertOption = formatOption(format, false);
+    const defaultOption = options.defaultArgs;
+    const etcOption = options.etcArgs;
+    const baseOption = convertOption + defaultOption + etcOption;
+    const worker = Worker.getInstance();
+    return {
+        fontName,
+        fontExt,
+        dirPath,
+        nameFormat,
+        baseOption,
+        worker
+    };
+}
+function getSaveOption(dirPath, nameFormat, fontName, fontExt, index) {
+    const fileName = nameFormat
+        .replace("{NAME}", fontName)
+        .replace("{EXT}", fontExt)
+        .replace("{INDEX}", (typeof index === "number")
+        ? index.toString()
+        : "");
+    return ("--output-file='" + (0, path_1.join)(dirPath, fileName) + "' ");
+}
+function getSubsetOption(fontSubsetOption) {
+    if (typeof fontSubsetOption !== "undefined" &&
+        typeof fontSubsetOption !== "string") {
+        if ("glyphsFile" in fontSubsetOption) {
+            return ("--text-file=" + fontSubsetOption.glyphsFile + " ");
+        }
+        if ("glyphs" in fontSubsetOption) {
+            return ("--glyphs=" + fontSubsetOption.glyphs) + " ";
+        }
+    }
+    return "--glyphs=* ";
+}
 function fontRange(url = exports.targets.korean, fontPath = "", fontRangeOption) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const options = Object.assign(getDefaultOptions(), typeof (fontRangeOption) === 'string'
-            ? { savePath: fontRangeOption }
-            : fontRangeOption);
-        const worker = Worker.getInstance();
-        const format = options.format;
-        const pathInfo = (0, path_1.parse)(fontPath);
-        const fontDir = pathInfo.dir;
-        const fontName = pathInfo.name;
-        const fontExt = formatOption(format);
-        const dirPath = getOption(options, 'savePath', fontDir);
-        const ranges = getUnicodeRanges(dirPath, url);
-        const convertOption = formatOption(format, false);
-        const defaultOption = options.defaultArgs;
-        const etcOption = options.etcArgs;
-        const nameFormat = options.nameFormat;
-        const eachRanges = yield ranges;
-        const result = eachRanges.map((unicodes, i) => tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const saveOption = "--output-file='" +
-                (0, path_1.join)(dirPath, getName(nameFormat, fontName, i, fontExt)) + "' ";
-            const unicodeRanges = unicodes.split(', ').join(',');
+        const { fontName, fontExt, dirPath, nameFormat, baseOption, worker } = getOptionInfos(fontPath, fontRangeOption);
+        const ranges = yield getUnicodeRanges(dirPath, url);
+        const result = ranges.map((unicodes, i) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const saveOption = getSaveOption(dirPath, nameFormat, fontName, fontExt, i);
+            const unicodeRanges = unicodes.split(", ").join(",");
             const unicodeOption = "--unicodes='" + unicodeRanges + "' ";
-            const options = " '" + fontPath + "' " + saveOption + unicodeOption
-                + convertOption + defaultOption + etcOption;
+            const options = " '" + fontPath + "' " + saveOption + unicodeOption + baseOption;
             const result = yield worker.run(options);
             return result;
         }));
@@ -211,4 +235,15 @@ function fontRange(url = exports.targets.korean, fontPath = "", fontRangeOption)
     });
 }
 exports.fontRange = fontRange;
+function fontSubset(fontPath = "", fontSubsetOption) {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const { fontName, fontExt, dirPath, nameFormat, baseOption, worker } = getOptionInfos(fontPath, fontSubsetOption);
+        const subsetOption = getSubsetOption(fontSubsetOption);
+        const saveOption = getSaveOption(dirPath, nameFormat, fontName, fontExt);
+        const options = " '" + fontPath + "' " + saveOption + subsetOption + baseOption;
+        const result = yield worker.run(options);
+        return result;
+    });
+}
+exports.fontSubset = fontSubset;
 //# sourceMappingURL=main.js.map

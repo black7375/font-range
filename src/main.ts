@@ -8,7 +8,7 @@ import Piscina from 'piscina';
 import type { RequiredByValueExcept, ValueOf } from './types';
 import type WorkerFn from './worker';
 
-// == Worker ==================================================================
+// == Worker ===================================================================
 type WorkerRT = ReturnType<typeof WorkerFn>;
 
 class Worker {
@@ -25,7 +25,7 @@ class Worker {
   }
 }
 
-// == Resouce Basics ==========================================================
+// == Resouce Basics ===========================================================
 export const targets = {
   weston:   "https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap",
   korean:   "https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap",
@@ -109,7 +109,7 @@ async function readCSS(path: string) {
   });
 }
 
-// == CSS Parse ===============================================================
+// == CSS Parse ================================================================
 const parseOptions: ParseOptions = {
   parseAtrulePrelude: false,
   parseRulePrelude:   false,
@@ -130,7 +130,7 @@ async function loadAST(dirPath: string, url = targets.korean, parseOption = pars
   return ast;
 }
 
-export async function getUnicodeRanges(dirPath = "src", url = targets.korean): Promise<string[]> {
+export async function getUnicodeRanges(dirPath = "src", url = targets.korean) {
   const ast           = await loadAST(dirPath, url);
   const unicodeNodes  = findAll(ast, (node, _item, _list) => {
     return (
@@ -149,7 +149,7 @@ export async function getUnicodeRanges(dirPath = "src", url = targets.korean): P
   return unicodeRanges;
 }
 
-// == Options =================================================================
+// == Options - Basics =========================================================
 interface fontRangeOptionI {
   savePath:    string;
   format:      string;
@@ -157,8 +157,16 @@ interface fontRangeOptionI {
   defaultArgs: string;
   etcArgs:     string;
 }
+interface fontSubsetOptionI extends fontRangeOptionI {
+  glyphsFile:  string;
+  glyphs:      string;
+}
+type argOptionT<I>     = fontRangeOptionI["savePath"] | Partial<I>;
+type fontRangeOptionT  = argOptionT<fontRangeOptionI>;
+type fontSubsetOptionT = argOptionT<fontSubsetOptionI>;
+type argOptionsT       = fontRangeOptionT | fontSubsetOptionT;
 
-function getDefaultOptions(): RequiredByValueExcept<fontRangeOptionI, 'savePath'> {
+function getDefaultOptions(): RequiredByValueExcept<fontRangeOptionI, "savePath"> {
   return {
     format:      "woff2",
     nameFormat:  "{NAME}_{INDEX}{EXT}",
@@ -177,20 +185,7 @@ function getDefaultOptions(): RequiredByValueExcept<fontRangeOptionI, 'savePath'
   };
 }
 
-function getOption(options: Partial<fontRangeOptionI>, key: keyof fontRangeOptionI, alterValue: ValueOf<fontRangeOptionI>) {
-  return Object.prototype.hasOwnProperty.call(options, key)
-    ? options[key]
-    : alterValue;
-}
-
-function getName(nameFormat: string, fontName: string, index: number, fontExt: string) {
-  return nameFormat
-    .replace( "{NAME}", fontName)
-    .replace("{INDEX}", index.toString())
-    .replace(  "{EXT}", fontExt);
-}
-
-// == Main ====================================================================
+// == Options - Get Info =======================================================
 function getFormat(format: string) {
   switch(format) {
     case "otf":   return "otf";
@@ -212,17 +207,19 @@ function formatOption(format: string, ext = true) {
        : formatName + "' ");
 }
 
-export async function fontRange(
-  url = targets.korean, fontPath = "",
-  fontRangeOption?: fontRangeOptionI['savePath'] | Partial<fontRangeOptionI>
-) {
+function getOption(options: Partial<fontRangeOptionI>, key: keyof fontRangeOptionI, alterValue: ValueOf<fontRangeOptionI>) {
+  return Object.prototype.hasOwnProperty.call(options, key)
+    ? options[key]
+    : alterValue;
+}
+
+function getOptionInfos(fontPath = "", fontOption?: argOptionsT) {
   const options = Object.assign(
     getDefaultOptions(),
-    typeof(fontRangeOption) === 'string'
-      ? { savePath: fontRangeOption }
-      : fontRangeOption
+    typeof(fontOption) === "string"
+      ? { savePath: fontOption }
+      : fontOption
   );
-  const worker  = Worker.getInstance();
 
   const format   = options.format;
   const pathInfo = parse(fontPath);
@@ -230,26 +227,95 @@ export async function fontRange(
   const fontName = pathInfo.name;
   const fontExt  = formatOption(format);
 
-  const dirPath  = getOption(options, 'savePath', fontDir);
-  const ranges   = getUnicodeRanges(dirPath, url);
+  const dirPath    = getOption(options, "savePath", fontDir);
+  const nameFormat = options.nameFormat;
 
   const convertOption = formatOption(format, false);
   const defaultOption = options.defaultArgs;
   const etcOption     = options.etcArgs;
+  const baseOption    = convertOption + defaultOption + etcOption;
 
-  const nameFormat = options.nameFormat;
-  const eachRanges = await ranges;
-  const result     = eachRanges.map(async (unicodes, i) => {
-    const saveOption = "--output-file='" +
-      join(dirPath, getName(nameFormat, fontName, i, fontExt)) + "' ";
-    const unicodeRanges = unicodes.split(', ').join(',');
+  const worker = Worker.getInstance();
+
+  return {
+    fontName,
+    fontExt,
+    dirPath,
+    nameFormat,
+
+    baseOption,
+    worker
+  };
+}
+
+// == Options - Others =========================================================
+function getSaveOption(dirPath: string, nameFormat: string, fontName: string, fontExt: string, index?: number) {
+  const fileName = nameFormat
+    .replace( "{NAME}", fontName)
+    .replace(  "{EXT}", fontExt)
+    .replace("{INDEX}",
+      (typeof index === "number")
+      ? index.toString()
+      : ""
+    );
+  return ("--output-file='" + join(dirPath, fileName) + "' ");
+}
+
+function getSubsetOption(fontSubsetOption?: fontSubsetOptionT) {
+  if(
+    typeof fontSubsetOption !== "undefined" &&
+    typeof fontSubsetOption !== "string"
+  ) {
+    if("glyphsFile" in fontSubsetOption) {
+      return ("--text-file=" + fontSubsetOption.glyphsFile + " ");
+    }
+    if("glyphs" in fontSubsetOption) {
+      return ("--glyphs=" + fontSubsetOption.glyphs) + " ";
+    }
+  }
+  return "--glyphs=* ";
+}
+
+// == Main =====================================================================
+export async function fontRange(url = targets.korean, fontPath = "", fontRangeOption?: fontRangeOptionT) {
+  const {
+    fontName,
+    fontExt,
+    dirPath,
+    nameFormat,
+
+    baseOption,
+    worker
+  } = getOptionInfos(fontPath, fontRangeOption);
+  const ranges = await getUnicodeRanges(dirPath, url);
+
+  const result = ranges.map(async (unicodes, i) => {
+    const saveOption    = getSaveOption(dirPath, nameFormat, fontName, fontExt, i);
+    const unicodeRanges = unicodes.split(", ").join(",");
     const unicodeOption = "--unicodes='" + unicodeRanges + "' ";
 
-    const options = " '" + fontPath + "' " + saveOption + unicodeOption
-      + convertOption + defaultOption + etcOption;
+    const options = " '" + fontPath + "' " + saveOption + unicodeOption + baseOption;
     const result: WorkerRT = await worker.run(options);
     return result;
   });
 
   return Promise.all(result);
+}
+
+export async function fontSubset(fontPath = "", fontSubsetOption?: fontSubsetOptionT) {
+  const {
+    fontName,
+    fontExt,
+    dirPath,
+    nameFormat,
+
+    baseOption,
+    worker
+  } = getOptionInfos(fontPath, fontSubsetOption);
+  const subsetOption = getSubsetOption(fontSubsetOption);
+  const saveOption   = getSaveOption(dirPath, nameFormat, fontName, fontExt);
+
+  const options = " '" + fontPath + "' " + saveOption + subsetOption + baseOption;
+  const result: WorkerRT = await worker.run(options);
+  return result;
 }

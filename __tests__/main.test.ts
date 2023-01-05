@@ -1,4 +1,4 @@
-import { targets, getUnicodeRanges, fontRange } from '../src/main';
+import { targets, getUnicodeRanges, fontRange, fontSubset } from '../src/main';
 import { join, parse } from 'path';
 import { existsSync, unlink, NoParamCallback } from 'fs';
 import fetch from 'node-fetch';
@@ -22,6 +22,7 @@ describe("Preset Check", () => {
   });
 });
 
+// https://github.com/piscinajs/piscina/issues/83
 const fontPath = join("__tests__", "font", "NotoSansKR-Regular.otf");
 const fontInfo = parse(fontPath);
 const fontDir  = fontInfo.dir;
@@ -75,5 +76,39 @@ describe("FontRange Online Feature", () => {
       // Remove file
       unlink(eachFontPath, errCallback);
     }
+  });
+});
+
+describe("FontSubset Format Feature", () => {
+  beforeAll(async () => {
+    return await fontSubset(fontPath, {
+      format: "woff",
+    });
+  }, timeout);
+
+  it("Font Created Check", async () => {
+    const fontFile = join(fontDir, fontName + "_" + ".woff");
+    expect(existsSync(fontFile)).toBe(true);
+
+    // Remove file
+    unlink(fontFile, errCallback);
+  });
+});
+
+describe("FontSubset Glyphs File Feature", () => {
+  beforeAll(async () => {
+    const glyphsFile = join(fontDir, "subset_glyphs.txt");
+    return await fontSubset(fontPath, {
+      glyphsFile,
+      nameFormat: "{NAME}.subset.{INDEX}{EXT}"
+    });
+  }, timeout);
+
+  it("Font Created Check", async () => {
+    const fontFile = join(fontDir, fontName + ".subset." + ".woff2");
+    expect(existsSync(fontFile)).toBe(true);
+
+    // Remove file
+    unlink(fontFile, errCallback);
   });
 });

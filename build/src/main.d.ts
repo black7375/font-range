@@ -14,5 +14,13 @@ interface fontRangeOptionI {
     defaultArgs: string;
     etcArgs: string;
 }
-export declare function fontRange(url?: string, fontPath?: string, fontRangeOption?: fontRangeOptionI['savePath'] | Partial<fontRangeOptionI>): Promise<Buffer[]>;
+interface fontSubsetOptionI extends fontRangeOptionI {
+    glyphsFile: string;
+    glyphs: string;
+}
+type argOptionT<I> = fontRangeOptionI["savePath"] | Partial<I>;
+type fontRangeOptionT = argOptionT<fontRangeOptionI>;
+type fontSubsetOptionT = argOptionT<fontSubsetOptionI>;
+export declare function fontRange(url?: string, fontPath?: string, fontRangeOption?: fontRangeOptionT): Promise<Buffer[]>;
+export declare function fontSubset(fontPath?: string, fontSubsetOption?: fontSubsetOptionT): Promise<Buffer>;
 export {};
