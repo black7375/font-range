@@ -161,10 +161,14 @@ interface fontSubsetOptionI extends fontRangeOptionI {
   glyphsFile:  string;
   glyphs:      string;
 }
+interface fontPipeOptionI extends fontSubsetOptionI {
+  cssFile:     string;
+}
 type argOptionT<I>     = fontRangeOptionI["savePath"] | Partial<I>;
 type fontRangeOptionT  = argOptionT<fontRangeOptionI>;
 type fontSubsetOptionT = argOptionT<fontSubsetOptionI>;
-type argOptionsT       = fontRangeOptionT | fontSubsetOptionT;
+type fontPipeOptionT   = Partial<fontPipeOptionI>;
+type argOptionsT       = fontRangeOptionT | fontSubsetOptionT | fontPipeOptionT;
 
 function getDefaultOptions(): RequiredByValueExcept<fontRangeOptionI, "savePath"> {
   return {
@@ -318,4 +322,24 @@ export async function fontSubset(fontPath = "", fontSubsetOption?: fontSubsetOpt
   const options = " '" + fontPath + "' " + saveOption + subsetOption + baseOption;
   const result: WorkerRT = await worker.run(options);
   return result;
+}
+
+// == Pipeline =================================================================
+interface fontPipeI {
+  fontPath: string;
+  fontPipeOption?: fontPipeOptionT;
+}
+
+function fontPipeExec(subsetTarget: fontPipeI) {
+  const { fontPath, fontPipeOption } = subsetTarget;
+
+  return ((typeof fontPipeOption         !== "undefined") &&
+          (typeof fontPipeOption.cssFile !== "undefined"))
+    ? fontRange(fontPipeOption.cssFile, fontPath, fontPipeOption).then(Buffer.concat)
+    : fontSubset(fontPath, fontPipeOption);
+}
+
+export function fontPipe(subsetList: fontPipeI[]) {
+  const result = subsetList.map(fontPipeExec);
+  return Promise.all(result);
 }

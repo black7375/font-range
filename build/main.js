@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fontSubset = exports.fontRange = exports.getUnicodeRanges = exports.targets = void 0;
+exports.fontPipe = exports.fontSubset = exports.fontRange = exports.getUnicodeRanges = exports.targets = void 0;
 const tslib_1 = require("tslib");
 const path_1 = require("path");
 const fs_1 = require("fs");
@@ -246,3 +246,17 @@ function fontSubset(fontPath = "", fontSubsetOption) {
     });
 }
 exports.fontSubset = fontSubset;
+function fontPipeExec(subsetTarget) {
+    const { fontPath, fontPipeOption } = subsetTarget;
+    if (typeof fontPipeOption !== "undefined") {
+        if (typeof fontPipeOption.cssFile !== "undefined") {
+            return fontRange(fontPipeOption.cssFile, fontPath, fontPipeOption).then(Buffer.concat);
+        }
+    }
+    return fontSubset(fontPath, fontPipeOption);
+}
+function fontPipe(subsetList) {
+    const result = subsetList.map(fontPipeExec);
+    return Promise.all(result);
+}
+exports.fontPipe = fontPipe;

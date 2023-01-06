@@ -18,9 +18,18 @@ interface fontSubsetOptionI extends fontRangeOptionI {
     glyphsFile: string;
     glyphs: string;
 }
+interface fontPipeOptionI extends fontSubsetOptionI {
+    cssFile: string;
+}
 type argOptionT<I> = fontRangeOptionI["savePath"] | Partial<I>;
 type fontRangeOptionT = argOptionT<fontRangeOptionI>;
 type fontSubsetOptionT = argOptionT<fontSubsetOptionI>;
+type fontPipeOptionT = Partial<fontPipeOptionI>;
 export declare function fontRange(url?: string, fontPath?: string, fontRangeOption?: fontRangeOptionT): Promise<Buffer[]>;
 export declare function fontSubset(fontPath?: string, fontSubsetOption?: fontSubsetOptionT): Promise<Buffer>;
+interface fontPipeI {
+    fontPath: string;
+    fontPipeOption?: fontPipeOptionT;
+}
+export declare function fontPipe(subsetList: fontPipeI[]): Promise<Buffer[]>;
 export {};

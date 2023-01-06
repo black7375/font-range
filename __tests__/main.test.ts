@@ -1,9 +1,11 @@
-import { targets, getUnicodeRanges, fontRange, fontSubset } from '../src/main';
+import { targets, getUnicodeRanges, fontRange, fontSubset, fontPipe } from '../src/main';
 import { join, parse } from 'path';
 import { existsSync, unlink, NoParamCallback } from 'fs';
 
 // https://github.com/piscinajs/piscina/issues/83
-const fontPath = join("__tests__", "font", "NotoSansKR-Regular.otf");
+const cssFile    = join("__tests__", "font", "NotoSansKR-Local.css"  );
+const glyphsFile = join("__tests__", "font", "subset_glyphs.txt"     );
+const fontPath   = join("__tests__", "font", "NotoSansKR-Regular.otf");
 const fontInfo = parse(fontPath);
 const fontDir  = fontInfo.dir;
 const fontName = fontInfo.name;
@@ -16,15 +18,14 @@ const errCallback: NoParamCallback = (err) => {
 const timeout = 60000;
 
 describe("FontRange Offline Feature", () => {
-  const cssPath = join("__tests__", "font", "NotoSansKR-Local.css");
   beforeAll(async () => {
-    return await fontRange(cssPath, fontPath, {
+    return await fontRange(cssFile, fontPath, {
       nameFormat: "{NAME}.subset.{INDEX}{EXT}"
     });
   }, timeout);
 
   it("Font Created Check", async () => {
-    const ranges  = await getUnicodeRanges(fontDir, cssPath);
+    const ranges  = await getUnicodeRanges(fontDir, cssFile);
     const rangesL = ranges.length;
     for (let counts = 0; counts < rangesL; counts++) {
       const eachFontPath = join(fontDir, fontName + ".subset." + counts + ".woff2");
@@ -77,7 +78,6 @@ describe("FontSubset Format Feature", () => {
 
 describe("FontSubset Glyphs File Feature", () => {
   beforeAll(async () => {
-    const glyphsFile = join(fontDir, "subset_glyphs.txt");
     return await fontSubset(fontPath, {
       glyphsFile,
       nameFormat: "{NAME}.subset.{INDEX}{EXT}"
@@ -90,5 +90,36 @@ describe("FontSubset Glyphs File Feature", () => {
 
     // Remove file
     unlink(fontFile, errCallback);
+  });
+});
+
+describe("FontSubset Pipeline Feature", () => {
+  beforeAll(async () => {
+    const pipe = [
+      { fontPath },
+      { fontPath, fontPipeOption: { glyphsFile, nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } },
+      { fontPath, fontPipeOption: { cssFile,    nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } }
+    ]
+    return await fontPipe(pipe);
+  }, timeout * 3);
+
+  it("Font Created Check", async () => {
+    const fontFile1 = join(fontDir, fontName + "_" + ".woff2");
+    const fontFile2 = join(fontDir, fontName + ".pipe." + ".woff2");
+
+    expect(existsSync(fontFile1)).toBe(true);
+    expect(existsSync(fontFile2)).toBe(true);
+    unlink(fontFile1, errCallback);
+    unlink(fontFile2, errCallback);
+
+    const ranges  = await getUnicodeRanges(fontDir, targets.korean);
+    const rangesL = ranges.length;
+    for (let counts = 0; counts < rangesL; counts++) {
+      const eachFontPath = join(fontDir, fontName + ".pipe." + counts + ".woff2");
+      expect(existsSync(eachFontPath)).toBe(true);
+
+      // Remove file
+      unlink(eachFontPath, errCallback);
+    }
   });
 });
