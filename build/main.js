@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fontPipe = exports.fontSubset = exports.fontRange = exports.getUnicodeRanges = exports.targets = void 0;
+exports.fontPipe = exports.fontSubset = exports.fontRange = exports.defaultArgs = exports.getUnicodeRanges = exports.targets = void 0;
 const tslib_1 = require("tslib");
 const path_1 = require("path");
 const fs_1 = require("fs");
@@ -130,23 +130,26 @@ function getUnicodeRanges(dirPath = "src", url = exports.targets.korean) {
     });
 }
 exports.getUnicodeRanges = getUnicodeRanges;
+exports.defaultArgs = [
+    "--layout-features=*",
+    "--glyph-names",
+    "--symbol-cmap",
+    "--legacy-cmap",
+    "--notdef-glyph",
+    "--notdef-outline",
+    "--recommended-glyphs",
+    "--name-legacy",
+    "--drop-tables=",
+    "--name-IDs=*",
+    "--name-languages=*"
+];
 function getDefaultOptions() {
     return {
         format: "woff2",
         nameFormat: "{NAME}_{INDEX}{EXT}",
-        defaultArgs: "--layout-features='*' \
-                  --glyph-names \
-                  --symbol-cmap \
-                  --legacy-cmap \
-                  --notdef-glyph \
-                  --notdef-outline \
-                  --recommended-glyphs \
-                  --name-legacy \
-                  --drop-tables= \
-                  --name-IDs='*' \
-                  --name-languages='*'",
-        etcArgs: "",
-        logFormat: "Convert {ORIGIN} -> {OUTPUT}"
+        logFormat: "Convert {ORIGIN} -> {OUTPUT}",
+        defaultArgs: exports.defaultArgs,
+        etcArgs: []
     };
 }
 function getFormat(format) {
@@ -165,14 +168,9 @@ function formatOption(format, ext = true) {
         return "." + formatName;
     if (format === "otf" || format === "ttf")
         return "";
-    return "--flavor='" + ((format === "woff-zopfli")
-        ? formatName + "' --with-zopfli "
-        : formatName + "' ");
-}
-function getOption(options, key, alterValue) {
-    return Object.prototype.hasOwnProperty.call(options, key)
-        ? options[key]
-        : alterValue;
+    return "--flavor=" + ((format === "woff-zopfli")
+        ? formatName + " --with-zopfli"
+        : formatName);
 }
 function getOptionInfos(fontPath = "", fontOption) {
     const options = Object.assign(getDefaultOptions(), typeof (fontOption) === "string"
@@ -184,13 +182,13 @@ function getOptionInfos(fontPath = "", fontOption) {
     const fontBase = pathInfo.base;
     const fontName = pathInfo.name;
     const fontExt = formatOption(format);
-    const dirPath = getOption(options, "savePath", fontDir);
+    const dirPath = Object.prototype.hasOwnProperty.call(options, "savePath") ? options["savePath"] : fontDir;
     const nameFormat = options.nameFormat;
     const logFormat = options.logFormat;
     const convertOption = formatOption(format, false);
     const defaultOption = options.defaultArgs;
     const etcOption = options.etcArgs;
-    const baseOption = convertOption + defaultOption + etcOption;
+    const baseOption = [convertOption, ...defaultOption, ...etcOption];
     const worker = Worker.getInstance();
     return {
         fontBase,
@@ -203,11 +201,6 @@ function getOptionInfos(fontPath = "", fontOption) {
         worker
     };
 }
-function getConsoleLog(logFormat, origin, output) {
-    return logFormat
-        .replace("{ORIGIN}", origin)
-        .replace("{OUTPUT}", output);
-}
 function getFileName(nameFormat, fontName, fontExt, index) {
     return nameFormat
         .replace("{NAME}", fontName)
@@ -218,21 +211,26 @@ function getFileName(nameFormat, fontName, fontExt, index) {
             ? index
             : "");
 }
+function getConsoleLog(logFormat, origin, output) {
+    return logFormat
+        .replace("{ORIGIN}", origin)
+        .replace("{OUTPUT}", output);
+}
 function getSaveOption(dirPath, nameFormat, fontName, fontExt, index) {
     const fileName = getFileName(nameFormat, fontName, fontExt, index);
-    return ("--output-file='" + (0, path_1.join)(dirPath, fileName) + "' ");
+    return ("--output-file=" + (0, path_1.join)(dirPath, fileName));
 }
 function getSubsetOption(fontSubsetOption) {
     if (typeof fontSubsetOption !== "undefined" &&
         typeof fontSubsetOption !== "string") {
         if ("textFile" in fontSubsetOption) {
-            return ("--text-file=" + fontSubsetOption.textFile + " ");
+            return ("--text-file=" + fontSubsetOption.textFile);
         }
         if ("text" in fontSubsetOption) {
-            return ("--text=" + fontSubsetOption.text) + " ";
+            return ("--text=" + fontSubsetOption.text);
         }
     }
-    return "--glyphs=* ";
+    return "--glyphs=*";
 }
 function consoleLog(fontBase, fontName, fontExt, nameFormat, logFormat, index) {
     if (logFormat !== "") {
@@ -249,8 +247,8 @@ function fontRange(url = exports.targets.korean, fontPath = "", fontRangeOption)
         const result = ranges.map((unicodes, i) => tslib_1.__awaiter(this, void 0, void 0, function* () {
             const saveOption = getSaveOption(dirPath, nameFormat, fontName, fontExt, i);
             const unicodeRanges = unicodes.split(", ").join(",");
-            const unicodeOption = "--unicodes='" + unicodeRanges + "' ";
-            const options = " '" + fontPath + "' " + saveOption + unicodeOption + baseOption;
+            const unicodeOption = "--unicodes=" + unicodeRanges;
+            const options = [fontPath, saveOption, unicodeOption, ...baseOption];
             const result = yield worker.run(options);
             return result;
         }));
@@ -264,7 +262,7 @@ function fontSubset(fontPath = "", fontSubsetOption) {
         consoleLog(fontBase, fontName, fontExt, nameFormat, logFormat);
         const subsetOption = getSubsetOption(fontSubsetOption);
         const saveOption = getSaveOption(dirPath, nameFormat, fontName, fontExt);
-        const options = " '" + fontPath + "' " + saveOption + subsetOption + baseOption;
+        const options = [fontPath, saveOption, subsetOption, ...baseOption];
         const result = yield worker.run(options);
         return result;
     });
@@ -274,7 +272,7 @@ function fontPipeExec(subsetTarget) {
     const { fontPath, fontPipeOption } = subsetTarget;
     return ((typeof fontPipeOption !== "undefined") &&
         (typeof fontPipeOption.cssFile !== "undefined"))
-        ? fontRange(fontPipeOption.cssFile, fontPath, fontPipeOption).then(Buffer.concat)
+        ? fontRange(fontPipeOption.cssFile, fontPath, fontPipeOption)
         : fontSubset(fontPath, fontPipeOption);
 }
 function fontPipe(subsetList) {

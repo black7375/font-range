@@ -1,2 +1,1 @@
-/// <reference types="node" />
-export default function subset(options: string): Buffer;
+export default function subset(options: string[]): import("@esm2cjs/execa").ExecaSyncReturnValue<string>;

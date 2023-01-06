@@ -1,20 +1,9 @@
 import { targets, getUnicodeRanges, fontRange, fontSubset, fontPipe } from '../src/main';
-import { join, parse } from 'path';
-import { existsSync, unlink, NoParamCallback } from 'fs';
+import { cssFile, textFile, fontPath, fontDir, fontName, unlink } from './shared';
+import { join } from 'path';
+import { existsSync } from 'fs';
 
 // https://github.com/piscinajs/piscina/issues/83
-const cssFile  = join("__tests__", "font", "NotoSansKR-Local.css"  );
-const textFile = join("__tests__", "font", "subset_glyphs.txt"     );
-const fontPath = join("__tests__", "font", "NotoSansKR-Regular.otf");
-const fontInfo = parse(fontPath);
-const fontDir  = fontInfo.dir;
-const fontName = fontInfo.name;
-const errCallback: NoParamCallback = (err) => {
-  if(err) {
-    console.error(err);
-    return;
-  }
-}
 const timeout = 60000;
 
 describe("FontRange Offline Feature", () => {
@@ -31,8 +20,7 @@ describe("FontRange Offline Feature", () => {
       const eachFontPath = join(fontDir, fontName + ".subset." + counts + ".woff2");
       expect(existsSync(eachFontPath)).toBe(true);
 
-      // Remove file
-      unlink(eachFontPath, errCallback);
+      unlink(eachFontPath);
     }
   });
 });
@@ -54,8 +42,7 @@ describe("FontRange Online Feature", () => {
       const eachFontPath = join(fontDir, fontName + "_" + counts + ".woff2");
       expect(existsSync(eachFontPath)).toBe(true);
 
-      // Remove file
-      unlink(eachFontPath, errCallback);
+      unlink(eachFontPath);
     }
   });
 });
@@ -71,8 +58,7 @@ describe("FontSubset Format Feature", () => {
     const fontFile = join(fontDir, fontName + "_" + ".woff");
     expect(existsSync(fontFile)).toBe(true);
 
-    // Remove file
-    unlink(fontFile, errCallback);
+    unlink(fontFile);
   });
 });
 
@@ -88,8 +74,7 @@ describe("FontSubset Glyphs File Feature", () => {
     const fontFile = join(fontDir, fontName + ".subset." + ".woff2");
     expect(existsSync(fontFile)).toBe(true);
 
-    // Remove file
-    unlink(fontFile, errCallback);
+    unlink(fontFile);
   });
 });
 
@@ -109,17 +94,15 @@ describe("FontSubset Pipeline Feature", () => {
 
     expect(existsSync(fontFile1)).toBe(true);
     expect(existsSync(fontFile2)).toBe(true);
-    unlink(fontFile1, errCallback);
-    unlink(fontFile2, errCallback);
+    unlink(fontFile1);
+    unlink(fontFile2);
 
     const ranges  = await getUnicodeRanges(fontDir, targets.korean);
     const rangesL = ranges.length;
     for (let counts = 0; counts < rangesL; counts++) {
       const eachFontPath = join(fontDir, fontName + ".pipe." + counts + ".woff2");
       expect(existsSync(eachFontPath)).toBe(true);
-
-      // Remove file
-      unlink(eachFontPath, errCallback);
+      unlink(eachFontPath);
     }
   });
 });

@@ -5,7 +5,7 @@ import fetch, { Headers } from 'node-fetch';
 import { parse as parseCSS, ParseOptions, findAll } from 'css-tree';
 import type { Declaration } from 'css-tree';
 import Piscina from 'piscina';
-import type { RequiredByValueExcept, ValueOf } from './types';
+import type { RequiredByValueExcept } from './types';
 import type WorkerFn from './worker';
 
 // == Worker ===================================================================
@@ -154,9 +154,9 @@ interface fontRangeOptionI {
   savePath:    string;
   format:      string;
   nameFormat:  string;
-  defaultArgs: string;
-  etcArgs:     string;
   logFormat:   string;
+  defaultArgs: string[];
+  etcArgs:     string[];
 }
 interface fontSubsetOptionI extends fontRangeOptionI {
   textFile:   string;
@@ -171,23 +171,27 @@ type fontSubsetOptionT = argOptionT<fontSubsetOptionI>;
 type fontPipeOptionT   = Partial<fontPipeOptionI>;
 type argOptionsT       = fontRangeOptionT | fontSubsetOptionT | fontPipeOptionT;
 
+export const defaultArgs = [
+  "--layout-features=*",
+  "--glyph-names",
+  "--symbol-cmap",
+  "--legacy-cmap",
+  "--notdef-glyph",
+  "--notdef-outline",
+  "--recommended-glyphs",
+  "--name-legacy",
+  "--drop-tables=",
+  "--name-IDs=*",
+  "--name-languages=*"
+]
+
 function getDefaultOptions(): RequiredByValueExcept<fontRangeOptionI, "savePath"> {
   return {
     format:      "woff2",
     nameFormat:  "{NAME}_{INDEX}{EXT}",
-    defaultArgs: "--layout-features='*' \
-                  --glyph-names \
-                  --symbol-cmap \
-                  --legacy-cmap \
-                  --notdef-glyph \
-                  --notdef-outline \
-                  --recommended-glyphs \
-                  --name-legacy \
-                  --drop-tables= \
-                  --name-IDs='*' \
-                  --name-languages='*'",
-    etcArgs:      "",
-    logFormat:    "Convert {ORIGIN} -> {OUTPUT}"
+    logFormat:    "Convert {ORIGIN} -> {OUTPUT}",
+    defaultArgs: defaultArgs,
+    etcArgs:     []
   };
 }
 
@@ -208,15 +212,9 @@ function formatOption(format: string, ext = true) {
   if(ext) return "." + formatName;
 
   if(format === "otf" || format === "ttf") return "";
-  return "--flavor='" + ((format === "woff-zopfli")
-       ? formatName + "' --with-zopfli "
-       : formatName + "' ");
-}
-
-function getOption(options: Partial<fontRangeOptionI>, key: keyof fontRangeOptionI, alterValue: ValueOf<fontRangeOptionI>) {
-  return Object.prototype.hasOwnProperty.call(options, key)
-    ? options[key]
-    : alterValue;
+  return "--flavor=" + ((format === "woff-zopfli")
+       ? formatName + " --with-zopfli"
+       : formatName);
 }
 
 function getOptionInfos(fontPath = "", fontOption?: argOptionsT) {
@@ -234,14 +232,14 @@ function getOptionInfos(fontPath = "", fontOption?: argOptionsT) {
   const fontName = pathInfo.name;
   const fontExt  = formatOption(format);
 
-  const dirPath    = getOption(options, "savePath", fontDir);
+  const dirPath    = Object.prototype.hasOwnProperty.call(options, "savePath") ? options["savePath"] : fontDir;
   const nameFormat = options.nameFormat;
-  const logFormat = options.logFormat;
+  const logFormat  = options.logFormat;
 
   const convertOption = formatOption(format, false);
   const defaultOption = options.defaultArgs;
   const etcOption     = options.etcArgs;
-  const baseOption    = convertOption + defaultOption + etcOption;
+  const baseOption    = [convertOption, ...defaultOption, ...etcOption];
 
   const worker = Worker.getInstance();
 
@@ -260,12 +258,6 @@ function getOptionInfos(fontPath = "", fontOption?: argOptionsT) {
 }
 
 // == Options - Others =========================================================
-function getConsoleLog(logFormat: string, origin: string, output: string) {
-  return logFormat
-    .replace("{ORIGIN}", origin)
-    .replace("{OUTPUT}", output);
-}
-
 function getFileName(nameFormat: string, fontName: string, fontExt: string, index?: number | string) {
   return nameFormat
     .replace( "{NAME}", fontName)
@@ -279,9 +271,15 @@ function getFileName(nameFormat: string, fontName: string, fontExt: string, inde
     );
 }
 
+function getConsoleLog(logFormat: string, origin: string, output: string) {
+  return logFormat
+    .replace("{ORIGIN}", origin)
+    .replace("{OUTPUT}", output);
+}
+
 function getSaveOption(dirPath: string, nameFormat: string, fontName: string, fontExt: string, index?: number) {
   const fileName = getFileName(nameFormat, fontName, fontExt, index);
-  return ("--output-file='" + join(dirPath, fileName) + "' ");
+  return ("--output-file=" + join(dirPath, fileName));
 }
 
 function getSubsetOption(fontSubsetOption?: fontSubsetOptionT) {
@@ -290,13 +288,13 @@ function getSubsetOption(fontSubsetOption?: fontSubsetOptionT) {
     typeof fontSubsetOption !== "string"
   ) {
     if("textFile" in fontSubsetOption) {
-      return ("--text-file=" + fontSubsetOption.textFile + " ");
+      return ("--text-file=" + fontSubsetOption.textFile);
     }
     if("text" in fontSubsetOption) {
-      return ("--text=" + fontSubsetOption.text) + " ";
+      return ("--text=" + fontSubsetOption.text);
     }
   }
-  return "--glyphs=* ";
+  return "--glyphs=*";
 }
 
 // == Main =====================================================================
@@ -331,9 +329,9 @@ export async function fontRange(url = targets.korean, fontPath = "", fontRangeOp
   const result = ranges.map(async (unicodes, i) => {
     const saveOption    = getSaveOption(dirPath, nameFormat, fontName, fontExt, i);
     const unicodeRanges = unicodes.split(", ").join(",");
-    const unicodeOption = "--unicodes='" + unicodeRanges + "' ";
+    const unicodeOption = "--unicodes=" + unicodeRanges;
 
-    const options = " '" + fontPath + "' " + saveOption + unicodeOption + baseOption;
+    const options = [fontPath, saveOption, unicodeOption, ...baseOption];
     const result: WorkerRT = await worker.run(options);
     return result;
   });
@@ -359,7 +357,7 @@ export async function fontSubset(fontPath = "", fontSubsetOption?: fontSubsetOpt
   const subsetOption = getSubsetOption(fontSubsetOption);
   const saveOption   = getSaveOption(dirPath, nameFormat, fontName, fontExt);
 
-  const options = " '" + fontPath + "' " + saveOption + subsetOption + baseOption;
+  const options = [fontPath, saveOption, subsetOption, ...baseOption];
   const result: WorkerRT = await worker.run(options);
   return result;
 }
@@ -375,7 +373,7 @@ function fontPipeExec(subsetTarget: fontPipeI) {
 
   return ((typeof fontPipeOption         !== "undefined") &&
           (typeof fontPipeOption.cssFile !== "undefined"))
-    ? fontRange(fontPipeOption.cssFile, fontPath, fontPipeOption).then(Buffer.concat)
+    ? fontRange(fontPipeOption.cssFile, fontPath, fontPipeOption)
     : fontSubset(fontPath, fontPipeOption);
 }
 

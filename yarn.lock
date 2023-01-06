@@ -433,6 +433,76 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@esm2cjs/execa@npm:^6.1.1-cjs.1":
+  version: 6.1.1-cjs.1
+  resolution: "@esm2cjs/execa@npm:6.1.1-cjs.1"
+  dependencies:
+    "@esm2cjs/human-signals": ^3.0.1
+    "@esm2cjs/is-stream": ^3.0.0
+    "@esm2cjs/npm-run-path": ^5.1.1-cjs.0
+    "@esm2cjs/onetime": ^6.0.1-cjs.0
+    "@esm2cjs/strip-final-newline": ^3.0.1-cjs.0
+    cross-spawn: ^7.0.3
+    get-stream: ^6.0.1
+    merge-stream: ^2.0.0
+    signal-exit: ^3.0.7
+  checksum: 7ae9c0b86f9a924c13f5ab258f07234424a0e33655d3f3c47b0e277adbf0281121586780484b02d09b724d9e753c3d4315a40683c15ff948d72fb12464cfd376
+  languageName: node
+  linkType: hard
+
+"@esm2cjs/human-signals@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "@esm2cjs/human-signals@npm:3.0.1"
+  checksum: b3943f331a039b2cce835306b67fb2a11aba2416ab93e58c6787028cf5a2bcb4aeef40a3df741c4e8196c4c85f0b84bee807a7dd3681f60cbedc0c04a43ed040
+  languageName: node
+  linkType: hard
+
+"@esm2cjs/is-stream@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@esm2cjs/is-stream@npm:3.0.0"
+  checksum: b122aac5cd8e9b3c258af42007e4fa08bed34abb8b69062b7e756d14cc09a230cee2816a5ef7403695390ace7ce2d8ccdcdc3e06f92023bb6d50aabc34c73681
+  languageName: node
+  linkType: hard
+
+"@esm2cjs/mimic-fn@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "@esm2cjs/mimic-fn@npm:4.0.0"
+  checksum: 1a6027769d61273bd4ba0e7dee9fd20969eb87b1b76974f82ada3f2f97ba2ed0ed1ecda26293cb867f62f28b1b90363dc7804f31c26cf6f76243f730f8d181d4
+  languageName: node
+  linkType: hard
+
+"@esm2cjs/npm-run-path@npm:^5.1.1-cjs.0":
+  version: 5.1.1-cjs.0
+  resolution: "@esm2cjs/npm-run-path@npm:5.1.1-cjs.0"
+  dependencies:
+    "@esm2cjs/path-key": ^4.0.0
+  checksum: 3ec07c58aa27072fb0992166774fbe1b7e9b8e9ff5fe70e9cc1042b4048f7e1abd50bc63a30d3de79143a72887a0ed2d1bc82d3ca80bcbd4bcdefc6b48b4bc93
+  languageName: node
+  linkType: hard
+
+"@esm2cjs/onetime@npm:^6.0.1-cjs.0":
+  version: 6.0.1-cjs.0
+  resolution: "@esm2cjs/onetime@npm:6.0.1-cjs.0"
+  dependencies:
+    "@esm2cjs/mimic-fn": ^4.0.0
+  checksum: 341e04f8ce1737cc1569f6fedb1d462559be7b67c762a2c862f39f08b1bf0cb13824941f0af87578d74e54ed6845b779d2af35999abb1c184ae555a1701bca7c
+  languageName: node
+  linkType: hard
+
+"@esm2cjs/path-key@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "@esm2cjs/path-key@npm:4.0.0"
+  checksum: f5207b14c33d8bf09aa3028ddee088d471a58763280e2c78ec14ca7910f07285cb53069c2ef7b1319f2d74ff2685c49267a65658dfac66e225cd614f8e4193ff
+  languageName: node
+  linkType: hard
+
+"@esm2cjs/strip-final-newline@npm:^3.0.1-cjs.0":
+  version: 3.0.1-cjs.0
+  resolution: "@esm2cjs/strip-final-newline@npm:3.0.1-cjs.0"
+  checksum: b840bc29339b4c62372e9d40c0ef9f319859fce9db35a5c49fd9e1d0ba75e560df475a00aa19504793dd5da39a7db1c3e4b9f60d191075a94029ea33e3aaa394
+  languageName: node
+  linkType: hard
+
 "@gar/promisify@npm:^1.1.3":
   version: 1.1.3
   resolution: "@gar/promisify@npm:1.1.3"
@@ -2208,6 +2278,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "font-range@workspace:."
   dependencies:
+    "@esm2cjs/execa": ^6.1.1-cjs.1
     "@types/command-exists": ^1.2.0
     "@types/css-tree": ^2.0.1
     "@types/jest": ^29.2.5
@@ -2322,7 +2393,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"get-stream@npm:^6.0.0":
+"get-stream@npm:^6.0.0, get-stream@npm:^6.0.1":
   version: 6.0.1
   resolution: "get-stream@npm:6.0.1"
   checksum: e04ecece32c92eebf5b8c940f51468cd53554dcbb0ea725b2748be583c9523d00128137966afce410b9b051eb2ef16d657cd2b120ca8edafcf5a65e81af63cad

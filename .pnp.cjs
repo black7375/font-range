@@ -28,6 +28,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         [null, {\
           "packageLocation": "./",\
           "packageDependencies": [\
+            ["@esm2cjs/execa", "npm:6.1.1-cjs.1"],\
             ["@types/command-exists", "npm:1.2.0"],\
             ["@types/css-tree", "npm:2.0.1"],\
             ["@types/jest", "npm:29.2.5"],\
@@ -858,6 +859,89 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["js-yaml", "npm:4.1.0"],\
             ["minimatch", "npm:3.1.2"],\
             ["strip-json-comments", "npm:3.1.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@esm2cjs/execa", [\
+        ["npm:6.1.1-cjs.1", {\
+          "packageLocation": "./.yarn/cache/@esm2cjs-execa-npm-6.1.1-cjs.1-46b8db9420-7ae9c0b86f.zip/node_modules/@esm2cjs/execa/",\
+          "packageDependencies": [\
+            ["@esm2cjs/execa", "npm:6.1.1-cjs.1"],\
+            ["@esm2cjs/human-signals", "npm:3.0.1"],\
+            ["@esm2cjs/is-stream", "npm:3.0.0"],\
+            ["@esm2cjs/npm-run-path", "npm:5.1.1-cjs.0"],\
+            ["@esm2cjs/onetime", "npm:6.0.1-cjs.0"],\
+            ["@esm2cjs/strip-final-newline", "npm:3.0.1-cjs.0"],\
+            ["cross-spawn", "npm:7.0.3"],\
+            ["get-stream", "npm:6.0.1"],\
+            ["merge-stream", "npm:2.0.0"],\
+            ["signal-exit", "npm:3.0.7"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@esm2cjs/human-signals", [\
+        ["npm:3.0.1", {\
+          "packageLocation": "./.yarn/cache/@esm2cjs-human-signals-npm-3.0.1-71a35d9b7f-b3943f331a.zip/node_modules/@esm2cjs/human-signals/",\
+          "packageDependencies": [\
+            ["@esm2cjs/human-signals", "npm:3.0.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@esm2cjs/is-stream", [\
+        ["npm:3.0.0", {\
+          "packageLocation": "./.yarn/cache/@esm2cjs-is-stream-npm-3.0.0-9e4d70dd48-b122aac5cd.zip/node_modules/@esm2cjs/is-stream/",\
+          "packageDependencies": [\
+            ["@esm2cjs/is-stream", "npm:3.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@esm2cjs/mimic-fn", [\
+        ["npm:4.0.0", {\
+          "packageLocation": "./.yarn/cache/@esm2cjs-mimic-fn-npm-4.0.0-cb169afa4b-1a6027769d.zip/node_modules/@esm2cjs/mimic-fn/",\
+          "packageDependencies": [\
+            ["@esm2cjs/mimic-fn", "npm:4.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@esm2cjs/npm-run-path", [\
+        ["npm:5.1.1-cjs.0", {\
+          "packageLocation": "./.yarn/cache/@esm2cjs-npm-run-path-npm-5.1.1-cjs.0-8b1f751bb4-3ec07c58aa.zip/node_modules/@esm2cjs/npm-run-path/",\
+          "packageDependencies": [\
+            ["@esm2cjs/npm-run-path", "npm:5.1.1-cjs.0"],\
+            ["@esm2cjs/path-key", "npm:4.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@esm2cjs/onetime", [\
+        ["npm:6.0.1-cjs.0", {\
+          "packageLocation": "./.yarn/cache/@esm2cjs-onetime-npm-6.0.1-cjs.0-48db318bee-341e04f8ce.zip/node_modules/@esm2cjs/onetime/",\
+          "packageDependencies": [\
+            ["@esm2cjs/onetime", "npm:6.0.1-cjs.0"],\
+            ["@esm2cjs/mimic-fn", "npm:4.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@esm2cjs/path-key", [\
+        ["npm:4.0.0", {\
+          "packageLocation": "./.yarn/cache/@esm2cjs-path-key-npm-4.0.0-fb0d57eff4-f5207b14c3.zip/node_modules/@esm2cjs/path-key/",\
+          "packageDependencies": [\
+            ["@esm2cjs/path-key", "npm:4.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@esm2cjs/strip-final-newline", [\
+        ["npm:3.0.1-cjs.0", {\
+          "packageLocation": "./.yarn/cache/@esm2cjs-strip-final-newline-npm-3.0.1-cjs.0-ebf6ecf605-b840bc2933.zip/node_modules/@esm2cjs/strip-final-newline/",\
+          "packageDependencies": [\
+            ["@esm2cjs/strip-final-newline", "npm:3.0.1-cjs.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -3060,6 +3144,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",\
           "packageDependencies": [\
             ["font-range", "workspace:."],\
+            ["@esm2cjs/execa", "npm:6.1.1-cjs.1"],\
             ["@types/command-exists", "npm:1.2.0"],\
             ["@types/css-tree", "npm:2.0.1"],\
             ["@types/jest", "npm:29.2.5"],\

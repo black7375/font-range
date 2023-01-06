@@ -54,6 +54,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@esm2cjs/execa": "^6.1.1-cjs.1",
     "@types/css-tree": "^2.0.1",
     "@types/node-fetch": "^2.6.2",
     "css-tree": "^2.3.1",
