@@ -1,12 +1,14 @@
-import { join, parse } from 'path';
-import { createReadStream, createWriteStream, existsSync } from 'fs';
-import { mkdir } from 'fs/promises';
-import fetch, { Headers } from 'node-fetch';
-import { parse as parseCSS, ParseOptions, findAll } from 'css-tree';
-import type { Declaration } from 'css-tree';
-import Piscina from 'piscina';
-import type { RequiredByValueExcept } from './types';
-import type WorkerFn from './worker';
+import { join, parse } from "path";
+import { createReadStream, createWriteStream, existsSync } from "fs";
+import { mkdir } from "fs/promises";
+
+import Piscina from "piscina";
+import fetch, { Headers } from "node-fetch";
+import { parse as parseCSS, ParseOptions, findAll } from "css-tree";
+import type { Declaration } from "css-tree";
+
+import type WorkerFn from "./worker";
+import type { RequiredByValueExcept } from "./types";
 
 // == Worker ===================================================================
 type WorkerRT = ReturnType<typeof WorkerFn>;

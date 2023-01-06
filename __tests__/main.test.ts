@@ -1,11 +1,10 @@
-import { targets, getUnicodeRanges, fontRange, fontSubset, fontPipe } from '../src/main';
-import { cssFile, textFile, fontPath, fontDir, fontName, unlink } from './shared';
-import { join } from 'path';
-import { existsSync } from 'fs';
+import { join } from "path";
+import { existsSync } from "fs";
+
+import { targets, getUnicodeRanges, fontRange, fontSubset, fontPipe } from "../src/main";
+import { timeout, cssFile, textFile, fontPath, fontDir, fontName, unlink } from "./shared";
 
 // https://github.com/piscinajs/piscina/issues/83
-const timeout = 60000;
-
 describe("FontRange Offline Feature", () => {
   beforeAll(async () => {
     return await fontRange(cssFile, fontPath, {

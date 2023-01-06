@@ -5,9 +5,9 @@ const tslib_1 = require("tslib");
 const path_1 = require("path");
 const fs_1 = require("fs");
 const promises_1 = require("fs/promises");
+const piscina_1 = tslib_1.__importDefault(require("piscina"));
 const node_fetch_1 = tslib_1.__importStar(require("node-fetch"));
 const css_tree_1 = require("css-tree");
-const piscina_1 = tslib_1.__importDefault(require("piscina"));
 class Worker {
     constructor() { }
     static getInstance() {
