@@ -156,6 +156,7 @@ interface fontRangeOptionI {
   nameFormat:  string;
   defaultArgs: string;
   etcArgs:     string;
+  logFormat:   string;
 }
 interface fontSubsetOptionI extends fontRangeOptionI {
   glyphsFile:  string;
@@ -185,7 +186,8 @@ function getDefaultOptions(): RequiredByValueExcept<fontRangeOptionI, "savePath"
                   --drop-tables= \
                   --name-IDs='*' \
                   --name-languages='*'",
-    etcArgs:      ""
+    etcArgs:      "",
+    logFormat:    "Convert {ORIGIN} -> {OUTPUT}"
   };
 }
 
@@ -228,11 +230,13 @@ function getOptionInfos(fontPath = "", fontOption?: argOptionsT) {
   const format   = options.format;
   const pathInfo = parse(fontPath);
   const fontDir  = pathInfo.dir;
+  const fontBase = pathInfo.base;
   const fontName = pathInfo.name;
   const fontExt  = formatOption(format);
 
   const dirPath    = getOption(options, "savePath", fontDir);
   const nameFormat = options.nameFormat;
+  const logFormat = options.logFormat;
 
   const convertOption = formatOption(format, false);
   const defaultOption = options.defaultArgs;
@@ -242,10 +246,13 @@ function getOptionInfos(fontPath = "", fontOption?: argOptionsT) {
   const worker = Worker.getInstance();
 
   return {
+    fontBase,
     fontName,
     fontExt,
+
     dirPath,
     nameFormat,
+    logFormat,
 
     baseOption,
     worker
@@ -253,15 +260,27 @@ function getOptionInfos(fontPath = "", fontOption?: argOptionsT) {
 }
 
 // == Options - Others =========================================================
-function getSaveOption(dirPath: string, nameFormat: string, fontName: string, fontExt: string, index?: number) {
-  const fileName = nameFormat
+function getConsoleLog(logFormat: string, origin: string, output: string) {
+  return logFormat
+    .replace("{ORIGIN}", origin)
+    .replace("{OUTPUT}", output);
+}
+
+function getFileName(nameFormat: string, fontName: string, fontExt: string, index?: number | string) {
+  return nameFormat
     .replace( "{NAME}", fontName)
-    .replace(  "{EXT}", fontExt)
+    .replace(  "{EXT}", fontExt )
     .replace("{INDEX}",
-      (typeof index === "number")
+        (typeof index === "number")
       ? index.toString()
+      : (typeof index === "string")
+      ? index
       : ""
     );
+}
+
+function getSaveOption(dirPath: string, nameFormat: string, fontName: string, fontExt: string, index?: number) {
+  const fileName = getFileName(nameFormat, fontName, fontExt, index);
   return ("--output-file='" + join(dirPath, fileName) + "' ");
 }
 
@@ -281,18 +300,34 @@ function getSubsetOption(fontSubsetOption?: fontSubsetOptionT) {
 }
 
 // == Main =====================================================================
+function consoleLog(
+  fontBase: string, fontName: string, fontExt: string,
+  nameFormat: string, logFormat: string,
+  index?: number | string
+  ) {
+  if(logFormat !== "") {
+    const output = getFileName(nameFormat, fontName, fontExt, index);
+    const log    = getConsoleLog(logFormat, fontBase, output);
+    console.log(log);
+  }
+}
+
 export async function fontRange(url = targets.korean, fontPath = "", fontRangeOption?: fontRangeOptionT) {
   const {
+    fontBase,
     fontName,
     fontExt,
+
     dirPath,
     nameFormat,
+    logFormat,
 
     baseOption,
     worker
   } = getOptionInfos(fontPath, fontRangeOption);
-  const ranges = await getUnicodeRanges(dirPath, url);
 
+  consoleLog(fontBase, fontName, fontExt, nameFormat, logFormat, "n");
+  const ranges = await getUnicodeRanges(dirPath, url);
   const result = ranges.map(async (unicodes, i) => {
     const saveOption    = getSaveOption(dirPath, nameFormat, fontName, fontExt, i);
     const unicodeRanges = unicodes.split(", ").join(",");
@@ -308,14 +343,19 @@ export async function fontRange(url = targets.korean, fontPath = "", fontRangeOp
 
 export async function fontSubset(fontPath = "", fontSubsetOption?: fontSubsetOptionT) {
   const {
+    fontBase,
     fontName,
     fontExt,
+
     dirPath,
     nameFormat,
+    logFormat,
 
     baseOption,
     worker
   } = getOptionInfos(fontPath, fontSubsetOption);
+
+  consoleLog(fontBase, fontName, fontExt, nameFormat, logFormat);
   const subsetOption = getSubsetOption(fontSubsetOption);
   const saveOption   = getSaveOption(dirPath, nameFormat, fontName, fontExt);
 

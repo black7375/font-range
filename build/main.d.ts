@@ -13,6 +13,7 @@ interface fontRangeOptionI {
     nameFormat: string;
     defaultArgs: string;
     etcArgs: string;
+    logFormat: string;
 }
 interface fontSubsetOptionI extends fontRangeOptionI {
     glyphsFile: string;

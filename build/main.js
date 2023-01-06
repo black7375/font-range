@@ -145,7 +145,8 @@ function getDefaultOptions() {
                   --drop-tables= \
                   --name-IDs='*' \
                   --name-languages='*'",
-        etcArgs: ""
+        etcArgs: "",
+        logFormat: "Convert {ORIGIN} -> {OUTPUT}"
     };
 }
 function getFormat(format) {
@@ -180,31 +181,45 @@ function getOptionInfos(fontPath = "", fontOption) {
     const format = options.format;
     const pathInfo = (0, path_1.parse)(fontPath);
     const fontDir = pathInfo.dir;
+    const fontBase = pathInfo.base;
     const fontName = pathInfo.name;
     const fontExt = formatOption(format);
     const dirPath = getOption(options, "savePath", fontDir);
     const nameFormat = options.nameFormat;
+    const logFormat = options.logFormat;
     const convertOption = formatOption(format, false);
     const defaultOption = options.defaultArgs;
     const etcOption = options.etcArgs;
     const baseOption = convertOption + defaultOption + etcOption;
     const worker = Worker.getInstance();
     return {
+        fontBase,
         fontName,
         fontExt,
         dirPath,
         nameFormat,
+        logFormat,
         baseOption,
         worker
     };
 }
-function getSaveOption(dirPath, nameFormat, fontName, fontExt, index) {
-    const fileName = nameFormat
+function getConsoleLog(logFormat, origin, output) {
+    return logFormat
+        .replace("{ORIGIN}", origin)
+        .replace("{OUTPUT}", output);
+}
+function getFileName(nameFormat, fontName, fontExt, index) {
+    return nameFormat
         .replace("{NAME}", fontName)
         .replace("{EXT}", fontExt)
         .replace("{INDEX}", (typeof index === "number")
         ? index.toString()
-        : "");
+        : (typeof index === "string")
+            ? index
+            : "");
+}
+function getSaveOption(dirPath, nameFormat, fontName, fontExt, index) {
+    const fileName = getFileName(nameFormat, fontName, fontExt, index);
     return ("--output-file='" + (0, path_1.join)(dirPath, fileName) + "' ");
 }
 function getSubsetOption(fontSubsetOption) {
@@ -219,9 +234,17 @@ function getSubsetOption(fontSubsetOption) {
     }
     return "--glyphs=* ";
 }
+function consoleLog(fontBase, fontName, fontExt, nameFormat, logFormat, index) {
+    if (logFormat !== "") {
+        const output = getFileName(nameFormat, fontName, fontExt, index);
+        const log = getConsoleLog(logFormat, fontBase, output);
+        console.log(log);
+    }
+}
 function fontRange(url = exports.targets.korean, fontPath = "", fontRangeOption) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { fontName, fontExt, dirPath, nameFormat, baseOption, worker } = getOptionInfos(fontPath, fontRangeOption);
+        const { fontBase, fontName, fontExt, dirPath, nameFormat, logFormat, baseOption, worker } = getOptionInfos(fontPath, fontRangeOption);
+        consoleLog(fontBase, fontName, fontExt, nameFormat, logFormat, "n");
         const ranges = yield getUnicodeRanges(dirPath, url);
         const result = ranges.map((unicodes, i) => tslib_1.__awaiter(this, void 0, void 0, function* () {
             const saveOption = getSaveOption(dirPath, nameFormat, fontName, fontExt, i);
@@ -237,7 +260,8 @@ function fontRange(url = exports.targets.korean, fontPath = "", fontRangeOption)
 exports.fontRange = fontRange;
 function fontSubset(fontPath = "", fontSubsetOption) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { fontName, fontExt, dirPath, nameFormat, baseOption, worker } = getOptionInfos(fontPath, fontSubsetOption);
+        const { fontBase, fontName, fontExt, dirPath, nameFormat, logFormat, baseOption, worker } = getOptionInfos(fontPath, fontSubsetOption);
+        consoleLog(fontBase, fontName, fontExt, nameFormat, logFormat);
         const subsetOption = getSubsetOption(fontSubsetOption);
         const saveOption = getSaveOption(dirPath, nameFormat, fontName, fontExt);
         const options = " '" + fontPath + "' " + saveOption + subsetOption + baseOption;
@@ -248,12 +272,10 @@ function fontSubset(fontPath = "", fontSubsetOption) {
 exports.fontSubset = fontSubset;
 function fontPipeExec(subsetTarget) {
     const { fontPath, fontPipeOption } = subsetTarget;
-    if (typeof fontPipeOption !== "undefined") {
-        if (typeof fontPipeOption.cssFile !== "undefined") {
-            return fontRange(fontPipeOption.cssFile, fontPath, fontPipeOption).then(Buffer.concat);
-        }
-    }
-    return fontSubset(fontPath, fontPipeOption);
+    return ((typeof fontPipeOption !== "undefined") &&
+        (typeof fontPipeOption.cssFile !== "undefined"))
+        ? fontRange(fontPipeOption.cssFile, fontPath, fontPipeOption).then(Buffer.concat)
+        : fontSubset(fontPath, fontPipeOption);
 }
 function fontPipe(subsetList) {
     const result = subsetList.map(fontPipeExec);
