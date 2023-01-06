@@ -159,8 +159,8 @@ interface fontRangeOptionI {
   logFormat:   string;
 }
 interface fontSubsetOptionI extends fontRangeOptionI {
-  glyphsFile:  string;
-  glyphs:      string;
+  textFile:   string;
+  text:       string;
 }
 interface fontPipeOptionI extends fontSubsetOptionI {
   cssFile:     string;
@@ -289,11 +289,11 @@ function getSubsetOption(fontSubsetOption?: fontSubsetOptionT) {
     typeof fontSubsetOption !== "undefined" &&
     typeof fontSubsetOption !== "string"
   ) {
-    if("glyphsFile" in fontSubsetOption) {
-      return ("--text-file=" + fontSubsetOption.glyphsFile + " ");
+    if("textFile" in fontSubsetOption) {
+      return ("--text-file=" + fontSubsetOption.textFile + " ");
     }
-    if("glyphs" in fontSubsetOption) {
-      return ("--glyphs=" + fontSubsetOption.glyphs) + " ";
+    if("text" in fontSubsetOption) {
+      return ("--text=" + fontSubsetOption.text) + " ";
     }
   }
   return "--glyphs=* ";

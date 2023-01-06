@@ -16,8 +16,8 @@ interface fontRangeOptionI {
     logFormat: string;
 }
 interface fontSubsetOptionI extends fontRangeOptionI {
-    glyphsFile: string;
-    glyphs: string;
+    textFile: string;
+    text: string;
 }
 interface fontPipeOptionI extends fontSubsetOptionI {
     cssFile: string;

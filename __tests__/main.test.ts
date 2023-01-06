@@ -3,9 +3,9 @@ import { join, parse } from 'path';
 import { existsSync, unlink, NoParamCallback } from 'fs';
 
 // https://github.com/piscinajs/piscina/issues/83
-const cssFile    = join("__tests__", "font", "NotoSansKR-Local.css"  );
-const glyphsFile = join("__tests__", "font", "subset_glyphs.txt"     );
-const fontPath   = join("__tests__", "font", "NotoSansKR-Regular.otf");
+const cssFile  = join("__tests__", "font", "NotoSansKR-Local.css"  );
+const textFile = join("__tests__", "font", "subset_glyphs.txt"     );
+const fontPath = join("__tests__", "font", "NotoSansKR-Regular.otf");
 const fontInfo = parse(fontPath);
 const fontDir  = fontInfo.dir;
 const fontName = fontInfo.name;
@@ -79,7 +79,7 @@ describe("FontSubset Format Feature", () => {
 describe("FontSubset Glyphs File Feature", () => {
   beforeAll(async () => {
     return await fontSubset(fontPath, {
-      glyphsFile,
+      textFile,
       nameFormat: "{NAME}.subset.{INDEX}{EXT}"
     });
   }, timeout);
@@ -97,8 +97,8 @@ describe("FontSubset Pipeline Feature", () => {
   beforeAll(async () => {
     const pipe = [
       { fontPath },
-      { fontPath, fontPipeOption: { glyphsFile, nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } },
-      { fontPath, fontPipeOption: { cssFile,    nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } }
+      { fontPath, fontPipeOption: { textFile, nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } },
+      { fontPath, fontPipeOption: { cssFile,  nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } }
     ]
     return await fontPipe(pipe);
   }, timeout * 3);

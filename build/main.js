@@ -225,11 +225,11 @@ function getSaveOption(dirPath, nameFormat, fontName, fontExt, index) {
 function getSubsetOption(fontSubsetOption) {
     if (typeof fontSubsetOption !== "undefined" &&
         typeof fontSubsetOption !== "string") {
-        if ("glyphsFile" in fontSubsetOption) {
-            return ("--text-file=" + fontSubsetOption.glyphsFile + " ");
+        if ("textFile" in fontSubsetOption) {
+            return ("--text-file=" + fontSubsetOption.textFile + " ");
         }
-        if ("glyphs" in fontSubsetOption) {
-            return ("--glyphs=" + fontSubsetOption.glyphs) + " ";
+        if ("text" in fontSubsetOption) {
+            return ("--text=" + fontSubsetOption.text) + " ";
         }
     }
     return "--glyphs=* ";
