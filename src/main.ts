@@ -3,7 +3,7 @@ import { createReadStream, createWriteStream, existsSync } from "fs";
 import { mkdir } from "fs/promises";
 
 import Piscina from "piscina";
-import fetch, { Headers } from "node-fetch";
+import fetch, { Headers } from "@esm2cjs/node-fetch";
 import { parse as parseCSS, ParseOptions, findAll } from "css-tree";
 import type { Declaration } from "css-tree";
 

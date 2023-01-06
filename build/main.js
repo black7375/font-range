@@ -6,7 +6,7 @@ const path_1 = require("path");
 const fs_1 = require("fs");
 const promises_1 = require("fs/promises");
 const piscina_1 = tslib_1.__importDefault(require("piscina"));
-const node_fetch_1 = tslib_1.__importStar(require("node-fetch"));
+const node_fetch_1 = tslib_1.__importStar(require("@esm2cjs/node-fetch"));
 const css_tree_1 = require("css-tree");
 class Worker {
     constructor() { }

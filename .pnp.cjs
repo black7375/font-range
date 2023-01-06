@@ -29,20 +29,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",\
           "packageDependencies": [\
             ["@esm2cjs/execa", "npm:6.1.1-cjs.1"],\
+            ["@esm2cjs/node-fetch", "npm:3.2.10"],\
             ["@types/command-exists", "npm:1.2.0"],\
             ["@types/css-tree", "npm:2.0.1"],\
             ["@types/jest", "npm:29.2.5"],\
             ["@types/node", "npm:18.11.18"],\
-            ["@types/node-fetch", "npm:2.6.2"],\
             ["@typescript-eslint/eslint-plugin", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:5.48.0"],\
             ["@typescript-eslint/parser", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:5.48.0"],\
             ["command-exists", "npm:1.2.9"],\
             ["css-tree", "npm:2.3.1"],\
             ["eslint", "npm:8.31.0"],\
             ["eslint-config-prettier", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:8.6.0"],\
-            ["eslint-plugin-jest", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:27.2.0"],\
+            ["eslint-plugin-jest", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:27.2.1"],\
             ["jest", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:29.3.1"],\
-            ["node-fetch", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:2.6.7"],\
             ["piscina", "npm:3.2.0"],\
             ["prettier", "npm:2.8.1"],\
             ["rimraf", "npm:3.0.2"],\
@@ -863,6 +862,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["@esm2cjs/data-uri-to-buffer", [\
+        ["npm:4.0.0", {\
+          "packageLocation": "./.yarn/cache/@esm2cjs-data-uri-to-buffer-npm-4.0.0-0028650a61-21834c7892.zip/node_modules/@esm2cjs/data-uri-to-buffer/",\
+          "packageDependencies": [\
+            ["@esm2cjs/data-uri-to-buffer", "npm:4.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["@esm2cjs/execa", [\
         ["npm:6.1.1-cjs.1", {\
           "packageLocation": "./.yarn/cache/@esm2cjs-execa-npm-6.1.1-cjs.1-46b8db9420-7ae9c0b86f.zip/node_modules/@esm2cjs/execa/",\
@@ -877,6 +885,27 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["get-stream", "npm:6.0.1"],\
             ["merge-stream", "npm:2.0.0"],\
             ["signal-exit", "npm:3.0.7"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@esm2cjs/fetch-blob", [\
+        ["npm:3.1.5", {\
+          "packageLocation": "./.yarn/cache/@esm2cjs-fetch-blob-npm-3.1.5-feab573fb7-e89aa6b35e.zip/node_modules/@esm2cjs/fetch-blob/",\
+          "packageDependencies": [\
+            ["@esm2cjs/fetch-blob", "npm:3.1.5"],\
+            ["node-domexception", "npm:1.0.0"],\
+            ["web-streams-polyfill", "npm:3.2.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@esm2cjs/formdata-polyfill", [\
+        ["npm:4.0.10", {\
+          "packageLocation": "./.yarn/cache/@esm2cjs-formdata-polyfill-npm-4.0.10-e5e85f5826-d61d324c52.zip/node_modules/@esm2cjs/formdata-polyfill/",\
+          "packageDependencies": [\
+            ["@esm2cjs/formdata-polyfill", "npm:4.0.10"],\
+            ["@esm2cjs/fetch-blob", "npm:3.1.5"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -904,6 +933,18 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@esm2cjs-mimic-fn-npm-4.0.0-cb169afa4b-1a6027769d.zip/node_modules/@esm2cjs/mimic-fn/",\
           "packageDependencies": [\
             ["@esm2cjs/mimic-fn", "npm:4.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@esm2cjs/node-fetch", [\
+        ["npm:3.2.10", {\
+          "packageLocation": "./.yarn/cache/@esm2cjs-node-fetch-npm-3.2.10-4b12a09b61-022d8095c4.zip/node_modules/@esm2cjs/node-fetch/",\
+          "packageDependencies": [\
+            ["@esm2cjs/node-fetch", "npm:3.2.10"],\
+            ["@esm2cjs/data-uri-to-buffer", "npm:4.0.0"],\
+            ["@esm2cjs/fetch-blob", "npm:3.1.5"],\
+            ["@esm2cjs/formdata-polyfill", "npm:4.0.10"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -1558,17 +1599,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
-      ["@types/node-fetch", [\
-        ["npm:2.6.2", {\
-          "packageLocation": "./.yarn/cache/@types-node-fetch-npm-2.6.2-f96c00879e-6f73b14700.zip/node_modules/@types/node-fetch/",\
-          "packageDependencies": [\
-            ["@types/node-fetch", "npm:2.6.2"],\
-            ["@types/node", "npm:18.11.18"],\
-            ["form-data", "npm:3.0.1"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
       ["@types/prettier", [\
         ["npm:2.7.2", {\
           "packageLocation": "./.yarn/cache/@types-prettier-npm-2.7.2-6b2e2f518f-b47d76a525.zip/node_modules/@types/prettier/",\
@@ -2012,15 +2042,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
-      ["asynckit", [\
-        ["npm:0.4.0", {\
-          "packageLocation": "./.yarn/cache/asynckit-npm-0.4.0-c718858525-7b78c451df.zip/node_modules/asynckit/",\
-          "packageDependencies": [\
-            ["asynckit", "npm:0.4.0"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
       ["babel-jest", [\
         ["npm:29.3.1", {\
           "packageLocation": "./.yarn/cache/babel-jest-npm-29.3.1-871da66c2a-793848238a.zip/node_modules/babel-jest/",\
@@ -2447,16 +2468,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
-      ["combined-stream", [\
-        ["npm:1.0.8", {\
-          "packageLocation": "./.yarn/cache/combined-stream-npm-1.0.8-dc14d4a63a-49fa4aeb49.zip/node_modules/combined-stream/",\
-          "packageDependencies": [\
-            ["combined-stream", "npm:1.0.8"],\
-            ["delayed-stream", "npm:1.0.0"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
       ["command-exists", [\
         ["npm:1.2.9", {\
           "packageLocation": "./.yarn/cache/command-exists-npm-1.2.9-cc51a1f78a-729ae3d88a.zip/node_modules/command-exists/",\
@@ -2569,15 +2580,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/deepmerge-npm-4.2.2-112165ced2-a8c43a1ed8.zip/node_modules/deepmerge/",\
           "packageDependencies": [\
             ["deepmerge", "npm:4.2.2"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
-      ["delayed-stream", [\
-        ["npm:1.0.0", {\
-          "packageLocation": "./.yarn/cache/delayed-stream-npm-1.0.0-c5a4c4cc02-46fe6e83e2.zip/node_modules/delayed-stream/",\
-          "packageDependencies": [\
-            ["delayed-stream", "npm:1.0.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -2806,17 +2808,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["eslint-plugin-jest", [\
-        ["npm:27.2.0", {\
-          "packageLocation": "./.yarn/cache/eslint-plugin-jest-npm-27.2.0-ee902eaec3-83554bb8ee.zip/node_modules/eslint-plugin-jest/",\
+        ["npm:27.2.1", {\
+          "packageLocation": "./.yarn/cache/eslint-plugin-jest-npm-27.2.1-c936ce0bdd-579a4d2630.zip/node_modules/eslint-plugin-jest/",\
           "packageDependencies": [\
-            ["eslint-plugin-jest", "npm:27.2.0"]\
+            ["eslint-plugin-jest", "npm:27.2.1"]\
           ],\
           "linkType": "SOFT"\
         }],\
-        ["virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:27.2.0", {\
-          "packageLocation": "./.yarn/__virtual__/eslint-plugin-jest-virtual-7496145183/0/cache/eslint-plugin-jest-npm-27.2.0-ee902eaec3-83554bb8ee.zip/node_modules/eslint-plugin-jest/",\
+        ["virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:27.2.1", {\
+          "packageLocation": "./.yarn/__virtual__/eslint-plugin-jest-virtual-5467746fa7/0/cache/eslint-plugin-jest-npm-27.2.1-c936ce0bdd-579a4d2630.zip/node_modules/eslint-plugin-jest/",\
           "packageDependencies": [\
-            ["eslint-plugin-jest", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:27.2.0"],\
+            ["eslint-plugin-jest", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:27.2.1"],\
             ["@types/eslint", null],\
             ["@types/jest", "npm:29.2.5"],\
             ["@types/typescript-eslint__eslint-plugin", null],\
@@ -3145,20 +3147,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["font-range", "workspace:."],\
             ["@esm2cjs/execa", "npm:6.1.1-cjs.1"],\
+            ["@esm2cjs/node-fetch", "npm:3.2.10"],\
             ["@types/command-exists", "npm:1.2.0"],\
             ["@types/css-tree", "npm:2.0.1"],\
             ["@types/jest", "npm:29.2.5"],\
             ["@types/node", "npm:18.11.18"],\
-            ["@types/node-fetch", "npm:2.6.2"],\
             ["@typescript-eslint/eslint-plugin", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:5.48.0"],\
             ["@typescript-eslint/parser", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:5.48.0"],\
             ["command-exists", "npm:1.2.9"],\
             ["css-tree", "npm:2.3.1"],\
             ["eslint", "npm:8.31.0"],\
             ["eslint-config-prettier", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:8.6.0"],\
-            ["eslint-plugin-jest", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:27.2.0"],\
+            ["eslint-plugin-jest", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:27.2.1"],\
             ["jest", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:29.3.1"],\
-            ["node-fetch", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:2.6.7"],\
             ["piscina", "npm:3.2.0"],\
             ["prettier", "npm:2.8.1"],\
             ["rimraf", "npm:3.0.2"],\
@@ -3168,18 +3169,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["typescript", "patch:typescript@npm%3A4.9.4#~builtin<compat/typescript>::version=4.9.4&hash=ad5954"]\
           ],\
           "linkType": "SOFT"\
-        }]\
-      ]],\
-      ["form-data", [\
-        ["npm:3.0.1", {\
-          "packageLocation": "./.yarn/cache/form-data-npm-3.0.1-d080d436e0-b019e8d35c.zip/node_modules/form-data/",\
-          "packageDependencies": [\
-            ["form-data", "npm:3.0.1"],\
-            ["asynckit", "npm:0.4.0"],\
-            ["combined-stream", "npm:1.0.8"],\
-            ["mime-types", "npm:2.1.27"]\
-          ],\
-          "linkType": "HARD"\
         }]\
       ]],\
       ["fs-minipass", [\
@@ -4545,25 +4534,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
-      ["mime-db", [\
-        ["npm:1.44.0", {\
-          "packageLocation": "./.yarn/cache/mime-db-npm-1.44.0-d6ab7b4e20-b261399680.zip/node_modules/mime-db/",\
-          "packageDependencies": [\
-            ["mime-db", "npm:1.44.0"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
-      ["mime-types", [\
-        ["npm:2.1.27", {\
-          "packageLocation": "./.yarn/cache/mime-types-npm-2.1.27-bbebca8e17-4c1f596c6d.zip/node_modules/mime-types/",\
-          "packageDependencies": [\
-            ["mime-types", "npm:2.1.27"],\
-            ["mime-db", "npm:1.44.0"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
       ["mimic-fn", [\
         ["npm:2.1.0", {\
           "packageLocation": "./.yarn/cache/mimic-fn-npm-2.1.0-4fbeb3abb4-d2421a3444.zip/node_modules/mimic-fn/",\
@@ -4747,25 +4717,11 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
-      ["node-fetch", [\
-        ["npm:2.6.7", {\
-          "packageLocation": "./.yarn/cache/node-fetch-npm-2.6.7-777aa2a6df-8d816ffd1e.zip/node_modules/node-fetch/",\
+      ["node-domexception", [\
+        ["npm:1.0.0", {\
+          "packageLocation": "./.yarn/cache/node-domexception-npm-1.0.0-e1e813b76f-ee1d37dd2a.zip/node_modules/node-domexception/",\
           "packageDependencies": [\
-            ["node-fetch", "npm:2.6.7"]\
-          ],\
-          "linkType": "SOFT"\
-        }],\
-        ["virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:2.6.7", {\
-          "packageLocation": "./.yarn/__virtual__/node-fetch-virtual-705bbf683d/0/cache/node-fetch-npm-2.6.7-777aa2a6df-8d816ffd1e.zip/node_modules/node-fetch/",\
-          "packageDependencies": [\
-            ["node-fetch", "virtual:750467c2e3dd725ac809718b7c43fbafe07f1aa4ba36806229e9c72a1c994b7f19fac10d527daa8c1e77877730e7363363db06196e85367a0fa1666e8bf88fad#npm:2.6.7"],\
-            ["@types/encoding", null],\
-            ["encoding", null],\
-            ["whatwg-url", "npm:5.0.0"]\
-          ],\
-          "packagePeers": [\
-            "@types/encoding",\
-            "encoding"\
+            ["node-domexception", "npm:1.0.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -5640,15 +5596,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
-      ["tr46", [\
-        ["npm:0.0.3", {\
-          "packageLocation": "./.yarn/cache/tr46-npm-0.0.3-de53018915-726321c5ea.zip/node_modules/tr46/",\
-          "packageDependencies": [\
-            ["tr46", "npm:0.0.3"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
       ["ts-jest", [\
         ["npm:29.0.3", {\
           "packageLocation": "./.yarn/cache/ts-jest-npm-29.0.3-c1e6bc8a8a-541e51776d.zip/node_modules/ts-jest/",\
@@ -5881,22 +5828,11 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
-      ["webidl-conversions", [\
-        ["npm:3.0.1", {\
-          "packageLocation": "./.yarn/cache/webidl-conversions-npm-3.0.1-60310f6a2b-c92a0a6ab9.zip/node_modules/webidl-conversions/",\
+      ["web-streams-polyfill", [\
+        ["npm:3.2.1", {\
+          "packageLocation": "./.yarn/cache/web-streams-polyfill-npm-3.2.1-835bd3857e-b119c78574.zip/node_modules/web-streams-polyfill/",\
           "packageDependencies": [\
-            ["webidl-conversions", "npm:3.0.1"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
-      ["whatwg-url", [\
-        ["npm:5.0.0", {\
-          "packageLocation": "./.yarn/cache/whatwg-url-npm-5.0.0-374fb45e60-b8daed4ad3.zip/node_modules/whatwg-url/",\
-          "packageDependencies": [\
-            ["whatwg-url", "npm:5.0.0"],\
-            ["tr46", "npm:0.0.3"],\
-            ["webidl-conversions", "npm:3.0.1"]\
+            ["web-streams-polyfill", "npm:3.2.1"]\
           ],\
           "linkType": "HARD"\
         }]\

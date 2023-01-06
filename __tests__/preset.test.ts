@@ -1,7 +1,7 @@
 import { join } from "path";
 import { existsSync } from "fs";
 
-import fetch from "node-fetch";
+import fetch from "@esm2cjs/node-fetch";
 import commandExists from "command-exists";
 
 import { targets, defaultArgs } from "../src/main";

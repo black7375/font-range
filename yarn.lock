@@ -433,6 +433,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@esm2cjs/data-uri-to-buffer@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "@esm2cjs/data-uri-to-buffer@npm:4.0.0"
+  checksum: 21834c7892621944e153a98ae35d3188c2fddfef68404cedca65bbf79a975a157b4ade3c27842f04ac82f8b03dde5e46e7e0c53de3aa6be0ded191417080a2e5
+  languageName: node
+  linkType: hard
+
 "@esm2cjs/execa@npm:^6.1.1-cjs.1":
   version: 6.1.1-cjs.1
   resolution: "@esm2cjs/execa@npm:6.1.1-cjs.1"
@@ -447,6 +454,25 @@ __metadata:
     merge-stream: ^2.0.0
     signal-exit: ^3.0.7
   checksum: 7ae9c0b86f9a924c13f5ab258f07234424a0e33655d3f3c47b0e277adbf0281121586780484b02d09b724d9e753c3d4315a40683c15ff948d72fb12464cfd376
+  languageName: node
+  linkType: hard
+
+"@esm2cjs/fetch-blob@npm:^3.1.2, @esm2cjs/fetch-blob@npm:^3.1.4":
+  version: 3.1.5
+  resolution: "@esm2cjs/fetch-blob@npm:3.1.5"
+  dependencies:
+    node-domexception: ^1.0.0
+    web-streams-polyfill: ^3.0.3
+  checksum: e89aa6b35e7aa118f92dc24841553e9edaf089e2d5d361409b79b0c4db47da4a2b093dda074638a95bd0703f744a031117813e7038247745b54f6a0e3758f835
+  languageName: node
+  linkType: hard
+
+"@esm2cjs/formdata-polyfill@npm:^4.0.10":
+  version: 4.0.10
+  resolution: "@esm2cjs/formdata-polyfill@npm:4.0.10"
+  dependencies:
+    "@esm2cjs/fetch-blob": ^3.1.2
+  checksum: d61d324c52da18916cd2fd0948e19d74bed0a8e0cb5fd397c366ac80d7952655eb71ecf062b6a893fdd0a26974333edc101c078f04e3431da44be08fb349c1b1
   languageName: node
   linkType: hard
 
@@ -468,6 +494,17 @@ __metadata:
   version: 4.0.0
   resolution: "@esm2cjs/mimic-fn@npm:4.0.0"
   checksum: 1a6027769d61273bd4ba0e7dee9fd20969eb87b1b76974f82ada3f2f97ba2ed0ed1ecda26293cb867f62f28b1b90363dc7804f31c26cf6f76243f730f8d181d4
+  languageName: node
+  linkType: hard
+
+"@esm2cjs/node-fetch@npm:^3.2.10":
+  version: 3.2.10
+  resolution: "@esm2cjs/node-fetch@npm:3.2.10"
+  dependencies:
+    "@esm2cjs/data-uri-to-buffer": ^4.0.0
+    "@esm2cjs/fetch-blob": ^3.1.4
+    "@esm2cjs/formdata-polyfill": ^4.0.10
+  checksum: 022d8095c44bdd26f89388ac7059c83af45c31a03ddd8fcfd32853652d2922b6f240d54b16162179743606fdc61266ea21be7849cad6e51abfa8a7cca56ba99a
   languageName: node
   linkType: hard
 
@@ -1029,16 +1066,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node-fetch@npm:^2.6.2":
-  version: 2.6.2
-  resolution: "@types/node-fetch@npm:2.6.2"
-  dependencies:
-    "@types/node": "*"
-    form-data: ^3.0.0
-  checksum: 6f73b1470000d303d25a6fb92875ea837a216656cb7474f66cdd67bb014aa81a5a11e7ac9c21fe19bee9ecb2ef87c1962bceeaec31386119d1ac86e4c30ad7a6
-  languageName: node
-  linkType: hard
-
 "@types/node@npm:*, @types/node@npm:^18.11.18":
   version: 18.11.18
   resolution: "@types/node@npm:18.11.18"
@@ -1359,13 +1386,6 @@ __metadata:
   version: 2.1.0
   resolution: "array-union@npm:2.1.0"
   checksum: 5bee12395cba82da674931df6d0fea23c4aa4660cb3b338ced9f828782a65caa232573e6bf3968f23e0c5eb301764a382cef2f128b170a9dc59de0e36c39f98d
-  languageName: node
-  linkType: hard
-
-"asynckit@npm:^0.4.0":
-  version: 0.4.0
-  resolution: "asynckit@npm:0.4.0"
-  checksum: 7b78c451df768adba04e2d02e63e2d0bf3b07adcd6e42b4cf665cb7ce899bedd344c69a1dcbce355b5f972d597b25aaa1c1742b52cffd9caccb22f348114f6be
   languageName: node
   linkType: hard
 
@@ -1702,15 +1722,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"combined-stream@npm:^1.0.8":
-  version: 1.0.8
-  resolution: "combined-stream@npm:1.0.8"
-  dependencies:
-    delayed-stream: ~1.0.0
-  checksum: 49fa4aeb4916567e33ea81d088f6584749fc90c7abec76fd516bf1c5aa5c79f3584b5ba3de6b86d26ddd64bae5329c4c7479343250cfe71c75bb366eae53bb7c
-  languageName: node
-  linkType: hard
-
 "command-exists@npm:^1.2.9":
   version: 1.2.9
   resolution: "command-exists@npm:1.2.9"
@@ -1797,13 +1808,6 @@ __metadata:
   version: 4.2.2
   resolution: "deepmerge@npm:4.2.2"
   checksum: a8c43a1ed8d6d1ed2b5bf569fa4c8eb9f0924034baf75d5d406e47e157a451075c4db353efea7b6bcc56ec48116a8ce72fccf867b6e078e7c561904b5897530b
-  languageName: node
-  linkType: hard
-
-"delayed-stream@npm:~1.0.0":
-  version: 1.0.0
-  resolution: "delayed-stream@npm:1.0.0"
-  checksum: 46fe6e83e2cb1d85ba50bd52803c68be9bd953282fa7096f51fc29edd5d67ff84ff753c51966061e5ba7cb5e47ef6d36a91924eddb7f3f3483b1c560f77a0020
   languageName: node
   linkType: hard
 
@@ -1945,9 +1949,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jest@npm:^27.2.0":
-  version: 27.2.0
-  resolution: "eslint-plugin-jest@npm:27.2.0"
+"eslint-plugin-jest@npm:^27.2.1":
+  version: 27.2.1
+  resolution: "eslint-plugin-jest@npm:27.2.1"
   dependencies:
     "@typescript-eslint/utils": ^5.10.0
   peerDependencies:
@@ -1958,7 +1962,7 @@ __metadata:
       optional: true
     jest:
       optional: true
-  checksum: 83554bb8eed289f903e2e03871a42a9b7b37b5e443d4a1501a42e004db49cddad894592ccec9840221b412ea3d2388428a1b11938031e5628d21c5a3210f1240
+  checksum: 579a4d26304cc6748b2e6dff6c965ea7a21b618d8b051eb02727d25cf5c7767f6db8ef5237531635ff77e242b983b973e7cb8c820a4d20d5bda73358c452a8ab
   languageName: node
   linkType: hard
 
@@ -2279,40 +2283,28 @@ __metadata:
   resolution: "font-range@workspace:."
   dependencies:
     "@esm2cjs/execa": ^6.1.1-cjs.1
+    "@esm2cjs/node-fetch": ^3.2.10
     "@types/command-exists": ^1.2.0
     "@types/css-tree": ^2.0.1
     "@types/jest": ^29.2.5
     "@types/node": ^18.11.18
-    "@types/node-fetch": ^2.6.2
     "@typescript-eslint/eslint-plugin": ^5.48.0
     "@typescript-eslint/parser": ^5.48.0
     command-exists: ^1.2.9
     css-tree: ^2.3.1
     eslint: ^8.31.0
     eslint-config-prettier: ^8.6.0
-    eslint-plugin-jest: ^27.2.0
+    eslint-plugin-jest: ^27.2.1
     jest: ^29.3.1
-    node-fetch: ^2.6.7
     piscina: ^3.2.0
     prettier: ^2.8.1
-    rimraf: ~3.0.2
+    rimraf: ^3.0.2
     ts-jest: ^29.0.3
     tslib: ^2.4.1
-    tsutils: ~3.21.0
+    tsutils: ^3.21.0
     typescript: ^4.9.4
   languageName: unknown
   linkType: soft
-
-"form-data@npm:^3.0.0":
-  version: 3.0.1
-  resolution: "form-data@npm:3.0.1"
-  dependencies:
-    asynckit: ^0.4.0
-    combined-stream: ^1.0.8
-    mime-types: ^2.1.12
-  checksum: b019e8d35c8afc14a2bd8a7a92fa4f525a4726b6d5a9740e8d2623c30e308fbb58dc8469f90415a856698933c8479b01646a9dff33c87cc4e76d72aedbbf860d
-  languageName: node
-  linkType: hard
 
 "fs-minipass@npm:^2.0.0, fs-minipass@npm:^2.1.0":
   version: 2.1.0
@@ -3490,22 +3482,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mime-db@npm:1.44.0":
-  version: 1.44.0
-  resolution: "mime-db@npm:1.44.0"
-  checksum: b2613996804d690adc4ca6744479b8ef08b04db7e99f84ab7e1274e0c2503a446d22296016ae0ea1a1d159858866445601c1f43d46c8d71d52f72842b1780c15
-  languageName: node
-  linkType: hard
-
-"mime-types@npm:^2.1.12":
-  version: 2.1.27
-  resolution: "mime-types@npm:2.1.27"
-  dependencies:
-    mime-db: 1.44.0
-  checksum: 4c1f596c6ddfc1a9c37356e91f471ae6e72401288197de31ef3604cf02ef14c6ac661adce55cece1f1c626a96d780ffd47435619606c103cb967fb007729eefb
-  languageName: node
-  linkType: hard
-
 "mimic-fn@npm:^2.1.0":
   version: 2.1.0
   resolution: "mimic-fn@npm:2.1.0"
@@ -3674,17 +3650,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-fetch@npm:^2.6.7":
-  version: 2.6.7
-  resolution: "node-fetch@npm:2.6.7"
-  dependencies:
-    whatwg-url: ^5.0.0
-  peerDependencies:
-    encoding: ^0.1.0
-  peerDependenciesMeta:
-    encoding:
-      optional: true
-  checksum: 8d816ffd1ee22cab8301c7756ef04f3437f18dace86a1dae22cf81db8ef29c0bf6655f3215cb0cdb22b420b6fe141e64b26905e7f33f9377a7fa59135ea3e10b
+"node-domexception@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "node-domexception@npm:1.0.0"
+  checksum: ee1d37dd2a4eb26a8a92cd6b64dfc29caec72bff5e1ed9aba80c294f57a31ba4895a60fd48347cf17dd6e766da0ae87d75657dfd1f384ebfa60462c2283f5c7f
   languageName: node
   linkType: hard
 
@@ -4134,7 +4103,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rimraf@npm:^3.0.2, rimraf@npm:~3.0.2":
+"rimraf@npm:^3.0.2":
   version: 3.0.2
   resolution: "rimraf@npm:3.0.2"
   dependencies:
@@ -4458,13 +4427,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tr46@npm:~0.0.3":
-  version: 0.0.3
-  resolution: "tr46@npm:0.0.3"
-  checksum: 726321c5eaf41b5002e17ffbd1fb7245999a073e8979085dacd47c4b4e8068ff5777142fc6726d6ca1fd2ff16921b48788b87225cbc57c72636f6efa8efbffe3
-  languageName: node
-  linkType: hard
-
 "ts-jest@npm:^29.0.3":
   version: 29.0.3
   resolution: "ts-jest@npm:29.0.3"
@@ -4512,7 +4474,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsutils@npm:^3.21.0, tsutils@npm:~3.21.0":
+"tsutils@npm:^3.21.0":
   version: 3.21.0
   resolution: "tsutils@npm:3.21.0"
   dependencies:
@@ -4641,20 +4603,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webidl-conversions@npm:^3.0.0":
-  version: 3.0.1
-  resolution: "webidl-conversions@npm:3.0.1"
-  checksum: c92a0a6ab95314bde9c32e1d0a6dfac83b578f8fa5f21e675bc2706ed6981bc26b7eb7e6a1fab158e5ce4adf9caa4a0aee49a52505d4d13c7be545f15021b17c
-  languageName: node
-  linkType: hard
-
-"whatwg-url@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "whatwg-url@npm:5.0.0"
-  dependencies:
-    tr46: ~0.0.3
-    webidl-conversions: ^3.0.0
-  checksum: b8daed4ad3356cc4899048a15b2c143a9aed0dfae1f611ebd55073310c7b910f522ad75d727346ad64203d7e6c79ef25eafd465f4d12775ca44b90fa82ed9e2c
+"web-streams-polyfill@npm:^3.0.3":
+  version: 3.2.1
+  resolution: "web-streams-polyfill@npm:3.2.1"
+  checksum: b119c78574b6d65935e35098c2afdcd752b84268e18746606af149e3c424e15621b6f1ff0b42b2676dc012fc4f0d313f964b41a4b5031e525faa03997457da02
   languageName: node
   linkType: hard
 
