@@ -49,7 +49,7 @@ function getCSSPath(dirPath, url) {
         return cssPath;
     }
     if (!(0, fs_1.existsSync)(url)) {
-        throw new Error(url + "Not vaild URL or PATH");
+        throw new Error("Not vaild URL or PATH: " + url);
     }
     return url;
 }
@@ -64,14 +64,20 @@ function saveCSS(path, url) {
             method: "GET",
             headers: headers
         });
-        const fileStream = (0, fs_1.createWriteStream)(path);
-        yield new Promise((resolve, reject) => {
+        if (res.status !== 200) {
+            throw new Error("Not vaild URL: " + url);
+        }
+        return new Promise((resolve, reject) => {
+            const fileStream = (0, fs_1.createWriteStream)(path);
             res.body.pipe(fileStream);
             res.body.on("error", (err) => {
                 console.log("File write Error.");
                 reject(err);
             });
-            fileStream.on("finish", function () {
+            res.body.on("close", () => {
+                fileStream.close();
+            });
+            fileStream.on("close", () => {
                 resolve();
             });
         });
@@ -170,18 +176,16 @@ function getFormat(format) {
         case "woff2": return "woff2";
         case "woff": return "woff";
         case "woff-zopfli": return "woff";
-        default: return "woff2";
     }
 }
-function formatOption(format, ext = true) {
+function formatOption(format) {
     const formatName = getFormat(format);
-    if (ext)
-        return "." + formatName;
     if (format === "otf" || format === "ttf")
-        return "";
-    return "--flavor=" + ((format === "woff-zopfli")
-        ? formatName + " --with-zopfli"
-        : formatName);
+        return [""];
+    return [
+        "--flavor=" + formatName,
+        (format === "woff-zopfli") ? "--with-zopfli" : ""
+    ];
 }
 function getOptionInfos(fontPath = "", fontOption) {
     const options = Object.assign({ fromCSS: "default" }, getDefaultOptions(), typeof (fontOption) === "string"
@@ -192,14 +196,18 @@ function getOptionInfos(fontPath = "", fontOption) {
     const fontDir = pathInfo.dir;
     const fontBase = pathInfo.base;
     const fontName = pathInfo.name;
-    const fontExt = formatOption(format);
+    const fontExt = "." + getFormat(format);
     const dirPath = Object.prototype.hasOwnProperty.call(options, "savePath") ? options["savePath"] : fontDir;
     const nameFormat = options.nameFormat;
     const logFormat = options.logFormat;
-    const convertOption = formatOption(format, false);
+    const convertOption = formatOption(format);
     const defaultOption = options.defaultArgs;
     const etcOption = options.etcArgs;
-    const baseOption = [convertOption, ...defaultOption, ...etcOption];
+    const baseOption = [
+        ...convertOption,
+        ...defaultOption,
+        ...etcOption
+    ].filter(option => option !== "");
     const worker = Worker.getInstance();
     return {
         fontBase,
@@ -247,14 +255,18 @@ function getSubsetOption(fontSubsetOption) {
     }
     return "--glyphs=*";
 }
-function consoleLog(fontBase, fontName, fontExt, nameFormat, logFormat, index) {
-    const initName = fileNameInit(nameFormat, fontName, fontExt);
-    if (logFormat !== "") {
-        const output = getFileName(initName, index);
-        const log = getConsoleLog(logFormat, fontBase, output);
-        console.log(log);
-    }
-    return initName;
+function initWithLog(dirPath, fontBase, fontName, fontExt, nameFormat, logFormat, index) {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const initName = fileNameInit(nameFormat, fontName, fontExt);
+        if (!(0, fs_1.existsSync)(dirPath))
+            yield (0, promises_1.mkdir)(dirPath);
+        if (logFormat !== "") {
+            const output = getFileName(initName, index);
+            const log = getConsoleLog(logFormat, fontBase, output);
+            console.log(log);
+        }
+        return initName;
+    });
 }
 function getSrcInfo(src) {
     const first = src.split(",").find((str) => {
@@ -280,7 +292,7 @@ function getSrcInfo(src) {
 function fontRange(url = exports.targets.korean, fontPath = "", fontRangeOption) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const { fontBase, fontName, fontExt, dirPath, nameFormat, logFormat, baseOption, worker, fromCSS } = getOptionInfos(fontPath, fontRangeOption);
-        const initName = consoleLog(fontBase, fontName, fontExt, nameFormat, logFormat, "n");
+        const initName = yield initWithLog(dirPath, fontBase, fontName, fontExt, nameFormat, logFormat, "n");
         const ranges = yield parseCSS(dirPath, url);
         const result = ranges.map(({ src, unicodes }, i) => tslib_1.__awaiter(this, void 0, void 0, function* () {
             const srcInfo = getSrcInfo(src);
@@ -302,7 +314,7 @@ exports.fontRange = fontRange;
 function fontSubset(fontPath = "", fontSubsetOption) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const { fontBase, fontName, fontExt, dirPath, nameFormat, logFormat, baseOption, worker } = getOptionInfos(fontPath, fontSubsetOption);
-        const initName = consoleLog(fontBase, fontName, fontExt, nameFormat, logFormat);
+        const initName = yield initWithLog(dirPath, fontBase, fontName, fontExt, nameFormat, logFormat);
         const subsetOption = getSubsetOption(fontSubsetOption);
         const saveOption = getSaveOption(dirPath, initName);
         const options = [fontPath, saveOption, subsetOption, ...baseOption];

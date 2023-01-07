@@ -17,7 +17,7 @@ jobs:
           ${{ runner.os }}-pip-
     - run: pip install -r ./requirements.txt
     - run: yarn run lint
-    - run: yarn test
     - run: yarn run build
       env:
         CI: true
+    - run: yarn test
