@@ -1,5 +1,5 @@
 import { join, parse } from "path";
-import { unlink as remove, PathLike , NoParamCallback } from "fs";
+import { unlink as remove, rm as removeDir, PathLike , NoParamCallback } from "fs";
 
 export const timeout = 60000;
 
@@ -17,7 +17,9 @@ const errCallback: NoParamCallback = (err) => {
   }
 }
 
-// Remove file
 export function unlink(path: PathLike) {
-  remove(path, errCallback);
+  remove(path, errCallback); // Remove file
+}
+export function rmdir(path: PathLike) {
+  removeDir(path, { recursive: true, force: true }, errCallback);
 }

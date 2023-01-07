@@ -1,8 +1,8 @@
 import { join } from "path";
 import { existsSync } from "fs";
 
-import { targets, getUnicodeRanges, fontRange, fontSubset, fontPipe } from "../src/main";
-import { timeout, cssFile, textFile, fontPath, fontDir, fontName, unlink } from "./shared";
+import { targets, parseCSS, fontRange, fontSubset, fontPipe } from "../src/main";
+import { timeout, cssFile, textFile, fontPath, fontDir, fontName, unlink, rmdir } from "./shared";
 
 // https://github.com/piscinajs/piscina/issues/83
 describe("FontRange Offline Feature", () => {
@@ -13,14 +13,56 @@ describe("FontRange Offline Feature", () => {
   }, timeout);
 
   it("Font Created Check", async () => {
-    const ranges  = await getUnicodeRanges(fontDir, cssFile);
-    const rangesL = ranges.length;
-    for (let counts = 0; counts < rangesL; counts++) {
+    const parsed  = await parseCSS(fontDir, cssFile);
+    const parsedL = parsed.length;
+    for (let counts = 0; counts < parsedL; counts++) {
       const eachFontPath = join(fontDir, fontName + ".subset." + counts + ".woff2");
       expect(existsSync(eachFontPath)).toBe(true);
 
       unlink(eachFontPath);
     }
+  });
+});
+
+describe("FontRange Options with srcIndex", () => {
+  const saveDir = join(fontDir, "srcIndex");
+  beforeAll(async () => {
+    return await fontRange(cssFile, fontPath, {
+      savePath:   saveDir,
+      nameFormat: "{NAME}.subset.{INDEX}{EXT}",
+      logFormat:  "{ORIGIN} to {OUTPUT}",
+      fromCSS:    "srcIndex"
+    });
+  }, timeout);
+
+  it("Font Created Check", async () => {
+    // Partial file checks
+    const file1 = join(saveDir, fontName + ".subset." + 119 + ".woff2");
+    const file2 = join(saveDir, fontName + ".subset." + 120 + ".woff2");
+    expect(existsSync(file1)).toBe(false);
+    expect(existsSync(file2)).toBe(true);
+
+    rmdir(saveDir);
+  });
+});
+
+describe("FontRange srcName Option", () => {
+  const saveDir = join(fontDir, "srcName");
+  beforeAll(async () => {
+    return await fontRange(cssFile, fontPath, {
+      savePath:   saveDir,
+      fromCSS:    "srcName"
+    });
+  }, timeout);
+
+  it("Font Created Check", async () => {
+    // Partial file checks
+    const file1 = join(saveDir, "PbykFmXiEBPT4ITbgNA5Cgm20xz64px_1hVWr0wuPNGmlQNMEfD4.0.woff2"  );
+    const file2 = join(saveDir, "PbykFmXiEBPT4ITbgNA5Cgm20xz64px_1hVWr0wuPNGmlQNMEfD4.120.woff2");
+    expect(existsSync(file1)).toBe(true);
+    expect(existsSync(file2)).toBe(true);
+
+    rmdir(saveDir);
   });
 });
 
@@ -35,9 +77,9 @@ describe("FontRange Online Feature", () => {
   });
 
   it("Font Created Check", async () => {
-    const ranges  = await getUnicodeRanges(fontDir, targets.korean);
-    const rangesL = ranges.length;
-    for (let counts = 0; counts < rangesL; counts++) {
+    const parsed  = await parseCSS(fontDir, cssFile);
+    const parsedL = parsed.length;
+    for (let counts = 0; counts < parsedL; counts++) {
       const eachFontPath = join(fontDir, fontName + "_" + counts + ".woff2");
       expect(existsSync(eachFontPath)).toBe(true);
 
@@ -96,9 +138,9 @@ describe("FontSubset Pipeline Feature", () => {
     unlink(fontFile1);
     unlink(fontFile2);
 
-    const ranges  = await getUnicodeRanges(fontDir, targets.korean);
-    const rangesL = ranges.length;
-    for (let counts = 0; counts < rangesL; counts++) {
+    const parsed  = await parseCSS(fontDir, cssFile);
+    const parsedL = parsed.length;
+    for (let counts = 0; counts < parsedL; counts++) {
       const eachFontPath = join(fontDir, fontName + ".pipe." + counts + ".woff2");
       expect(existsSync(eachFontPath)).toBe(true);
       unlink(eachFontPath);

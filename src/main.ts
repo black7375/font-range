@@ -4,7 +4,7 @@ import { mkdir } from "fs/promises";
 
 import Piscina from "piscina";
 import fetch, { Headers } from "@esm2cjs/node-fetch";
-import { parse as parseCSS, ParseOptions, findAll } from "css-tree";
+import { parse as cssAST, ParseOptions, walk } from "css-tree";
 import type { Declaration } from "css-tree";
 
 import type WorkerFn from "./worker";
@@ -128,50 +128,69 @@ async function loadAST(dirPath: string, url = targets.korean, parseOption = pars
   }
 
   const css = await readCSS(cssPath);
-  const ast =       parseCSS(css, parseOption);
-  return ast;
+  return cssAST(css, parseOption);
 }
 
-export async function getUnicodeRanges(dirPath = "src", url = targets.korean) {
-  const ast           = await loadAST(dirPath, url);
-  const unicodeNodes  = findAll(ast, (node, _item, _list) => {
-    return (
-      node.type     === "Declaration"   &&
-      node.property === "unicode-range"
-    );
-  });
-
-  const unicodeRanges = unicodeNodes.reduce((unicodeRanges: string[], node: Declaration) => {
-    const nodeValue = node.value;
-    if(nodeValue.type === "Raw") {
-      unicodeRanges.push(nodeValue.value);
+interface BlockI {
+  src:      string;
+  unicodes: string;
+}
+function setBlock(block: BlockI, elem: Declaration, property: string) {
+  if(elem.property === property) {
+    if(elem.value.type === "Raw") {
+      block[property] = elem.value.value;
     }
-    return unicodeRanges;
-  }, []);
-  return unicodeRanges;
+  }
+}
+
+export async function parseCSS(dirPath = "src", url = targets.korean) {
+  const ast    = await loadAST(dirPath, url);
+  const parsed = [] as BlockI[];
+
+  walk(ast, { visit: "Atrule", enter(node) {
+    if(node.name === "font-face") {
+      const block = {
+        src: "",
+        unicodes: ""
+      };
+      walk(node, { visit: "Declaration", enter(elem) {
+        setBlock(block, elem, "src");
+        setBlock(block, elem, "unicode-range");
+      }});
+
+      if(block.src !== "" || block.unicodes !== "") {
+        parsed.push(block);
+      }
+    }
+  }});
+  return parsed;
 }
 
 // == Options - Basics =========================================================
-interface fontRangeOptionI {
+interface fontDefaultOptionI {
   savePath:    string;
-  format:      string;
+  format:      format;
   nameFormat:  string;
   logFormat:   string;
   defaultArgs: string[];
   etcArgs:     string[];
 }
-interface fontSubsetOptionI extends fontRangeOptionI {
-  textFile:   string;
-  text:       string;
+interface fontRangeOptionI extends fontDefaultOptionI {
+  fromCSS:    "default" | "srcIndex" | "srcName";
 }
-interface fontPipeOptionI extends fontSubsetOptionI {
+interface fontSubsetOptionI extends fontDefaultOptionI {
+  textFile:    string;
+  text:        string;
+}
+interface fontPipeOptionI extends fontRangeOptionI, fontSubsetOptionI {
   cssFile:     string;
 }
-type argOptionT<I>     = fontRangeOptionI["savePath"] | Partial<I>;
+type argOptionT<I>     = fontDefaultOptionI["savePath"] | Partial<I>;
 type fontRangeOptionT  = argOptionT<fontRangeOptionI>;
 type fontSubsetOptionT = argOptionT<fontSubsetOptionI>;
 type fontPipeOptionT   = Partial<fontPipeOptionI>;
 type argOptionsT       = fontRangeOptionT | fontSubsetOptionT | fontPipeOptionT;
+type format            = "otf" | "ttf" | "woff2" | "woff" | "woff-zopfli";
 
 export const defaultArgs = [
   "--layout-features=*",
@@ -185,9 +204,9 @@ export const defaultArgs = [
   "--drop-tables=",
   "--name-IDs=*",
   "--name-languages=*"
-]
+];
 
-function getDefaultOptions(): RequiredByValueExcept<fontRangeOptionI, "savePath"> {
+function getDefaultOptions(): RequiredByValueExcept<fontDefaultOptionI, "savePath"> {
   return {
     format:      "woff2",
     nameFormat:  "{NAME}_{INDEX}{EXT}",
@@ -198,7 +217,7 @@ function getDefaultOptions(): RequiredByValueExcept<fontRangeOptionI, "savePath"
 }
 
 // == Options - Get Info =======================================================
-function getFormat(format: string) {
+function getFormat(format: format) {
   switch(format) {
     case "otf":   return "otf";
     case "ttf":   return "ttf";
@@ -209,7 +228,7 @@ function getFormat(format: string) {
   }
 }
 
-function formatOption(format: string, ext = true) {
+function formatOption(format: format, ext = true) {
   const formatName = getFormat(format);
   if(ext) return "." + formatName;
 
@@ -220,7 +239,8 @@ function formatOption(format: string, ext = true) {
 }
 
 function getOptionInfos(fontPath = "", fontOption?: argOptionsT) {
-  const options = Object.assign(
+  const options: fontPipeOptionT = Object.assign(
+    { fromCSS: "default" } satisfies Partial<fontRangeOptionI>,
     getDefaultOptions(),
     typeof(fontOption) === "string"
       ? { savePath: fontOption }
@@ -255,15 +275,20 @@ function getOptionInfos(fontPath = "", fontOption?: argOptionsT) {
     logFormat,
 
     baseOption,
-    worker
+    worker,
+
+    fromCSS: options.fromCSS
   };
 }
 
 // == Options - Others =========================================================
-function getFileName(nameFormat: string, fontName: string, fontExt: string, index?: number | string) {
+function fileNameInit(nameFormat: string, fontName: string, fontExt: string) {
   return nameFormat
     .replace( "{NAME}", fontName)
-    .replace(  "{EXT}", fontExt )
+    .replace(  "{EXT}", fontExt );
+}
+function getFileName(initName: string, index?: number | string) {
+  return initName
     .replace("{INDEX}",
         (typeof index === "number")
       ? index.toString()
@@ -279,8 +304,8 @@ function getConsoleLog(logFormat: string, origin: string, output: string) {
     .replace("{OUTPUT}", output);
 }
 
-function getSaveOption(dirPath: string, nameFormat: string, fontName: string, fontExt: string, index?: number) {
-  const fileName = getFileName(nameFormat, fontName, fontExt, index);
+function getSaveOption(dirPath: string, initName: string, index?: number) {
+  const fileName = getFileName(initName, index);
   return ("--output-file=" + join(dirPath, fileName));
 }
 
@@ -292,8 +317,8 @@ function getSubsetOption(fontSubsetOption?: fontSubsetOptionT) {
     if("textFile" in fontSubsetOption) {
       return ("--text-file=" + fontSubsetOption.textFile);
     }
-    if("text" in fontSubsetOption) {
-      return ("--text=" + fontSubsetOption.text);
+    if("text"     in fontSubsetOption) {
+      return ("--text="      + fontSubsetOption.text    );
     }
   }
   return "--glyphs=*";
@@ -301,14 +326,44 @@ function getSubsetOption(fontSubsetOption?: fontSubsetOptionT) {
 
 // == Main =====================================================================
 function consoleLog(
-  fontBase: string, fontName: string, fontExt: string,
+  fontBase: string,   fontName:  string, fontExt: string,
   nameFormat: string, logFormat: string,
   index?: number | string
   ) {
+  const initName = fileNameInit(nameFormat, fontName, fontExt);
+
   if(logFormat !== "") {
-    const output = getFileName(nameFormat, fontName, fontExt, index);
+    const output = getFileName(initName, index);
     const log    = getConsoleLog(logFormat, fontBase, output);
     console.log(log);
+  }
+  return initName;
+}
+
+function getSrcInfo(src: string) {
+  const first = src.split(",").find((str) => {
+    return str.indexOf("url(") === 0;
+  });
+  if(typeof first === "undefined") return {
+    base:  "",
+    index: 0
+  };
+
+  const reStr = "url\\(";
+  const reMdl = "(.+?)";
+  const reEnd = "\\)";
+  const quote = "(\\\\?['\"])?";
+  const regex = new RegExp(
+    reStr + quote + reMdl + quote + reEnd
+  );
+
+  const urlContent = first.match(regex)[2];
+  const parsedURL  = parse(urlContent);
+  return {
+    base:  parsedURL.base,
+    index: parseInt(
+      parsedURL.name.split(".").pop()  // google font index at latest
+    )
   }
 }
 
@@ -323,13 +378,24 @@ export async function fontRange(url = targets.korean, fontPath = "", fontRangeOp
     logFormat,
 
     baseOption,
-    worker
-  } = getOptionInfos(fontPath, fontRangeOption);
+    worker,
 
-  consoleLog(fontBase, fontName, fontExt, nameFormat, logFormat, "n");
-  const ranges = await getUnicodeRanges(dirPath, url);
-  const result = ranges.map(async (unicodes, i) => {
-    const saveOption    = getSaveOption(dirPath, nameFormat, fontName, fontExt, i);
+    fromCSS
+  } = getOptionInfos(fontPath, fontRangeOption);
+  const initName = consoleLog(fontBase, fontName, fontExt, nameFormat, logFormat, "n");
+
+  const ranges = await parseCSS(dirPath, url);
+  const result = ranges.map(async ({src, unicodes}, i) => {
+    const srcInfo       = getSrcInfo(src);
+    const saveOption    = getSaveOption(
+      dirPath,
+      (fromCSS === "srcName"  && srcInfo.base !== "")
+        ? srcInfo.base
+        : initName,
+      (fromCSS === "srcIndex" && srcInfo.base !== "")
+        ? srcInfo.index
+        : i
+    );
     const unicodeRanges = unicodes.split(", ").join(",");
     const unicodeOption = "--unicodes=" + unicodeRanges;
 
@@ -355,9 +421,9 @@ export async function fontSubset(fontPath = "", fontSubsetOption?: fontSubsetOpt
     worker
   } = getOptionInfos(fontPath, fontSubsetOption);
 
-  consoleLog(fontBase, fontName, fontExt, nameFormat, logFormat);
+  const initName     = consoleLog(fontBase, fontName, fontExt, nameFormat, logFormat);
   const subsetOption = getSubsetOption(fontSubsetOption);
-  const saveOption   = getSaveOption(dirPath, nameFormat, fontName, fontExt);
+  const saveOption   = getSaveOption(dirPath, initName);
 
   const options = [fontPath, saveOption, subsetOption, ...baseOption];
   const result: WorkerRT = await worker.run(options);

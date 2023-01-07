@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fontPipe = exports.fontSubset = exports.fontRange = exports.defaultArgs = exports.getUnicodeRanges = exports.targets = void 0;
+exports.fontPipe = exports.fontSubset = exports.fontRange = exports.defaultArgs = exports.parseCSS = exports.targets = void 0;
 const tslib_1 = require("tslib");
 const path_1 = require("path");
 const fs_1 = require("fs");
@@ -108,28 +108,39 @@ function loadAST(dirPath, url = exports.targets.korean, parseOption = parseOptio
             yield saveCSS(cssPath, url);
         }
         const css = yield readCSS(cssPath);
-        const ast = (0, css_tree_1.parse)(css, parseOption);
-        return ast;
+        return (0, css_tree_1.parse)(css, parseOption);
     });
 }
-function getUnicodeRanges(dirPath = "src", url = exports.targets.korean) {
+function setBlock(block, elem, property) {
+    if (elem.property === property) {
+        if (elem.value.type === "Raw") {
+            block[property] = elem.value.value;
+        }
+    }
+}
+function parseCSS(dirPath = "src", url = exports.targets.korean) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const ast = yield loadAST(dirPath, url);
-        const unicodeNodes = (0, css_tree_1.findAll)(ast, (node, _item, _list) => {
-            return (node.type === "Declaration" &&
-                node.property === "unicode-range");
-        });
-        const unicodeRanges = unicodeNodes.reduce((unicodeRanges, node) => {
-            const nodeValue = node.value;
-            if (nodeValue.type === "Raw") {
-                unicodeRanges.push(nodeValue.value);
-            }
-            return unicodeRanges;
-        }, []);
-        return unicodeRanges;
+        const parsed = [];
+        (0, css_tree_1.walk)(ast, { visit: "Atrule", enter(node) {
+                if (node.name === "font-face") {
+                    const block = {
+                        src: "",
+                        unicodes: ""
+                    };
+                    (0, css_tree_1.walk)(node, { visit: "Declaration", enter(elem) {
+                            setBlock(block, elem, "src");
+                            setBlock(block, elem, "unicode-range");
+                        } });
+                    if (block.src !== "" || block.unicodes !== "") {
+                        parsed.push(block);
+                    }
+                }
+            } });
+        return parsed;
     });
 }
-exports.getUnicodeRanges = getUnicodeRanges;
+exports.parseCSS = parseCSS;
 exports.defaultArgs = [
     "--layout-features=*",
     "--glyph-names",
@@ -173,7 +184,7 @@ function formatOption(format, ext = true) {
         : formatName);
 }
 function getOptionInfos(fontPath = "", fontOption) {
-    const options = Object.assign(getDefaultOptions(), typeof (fontOption) === "string"
+    const options = Object.assign({ fromCSS: "default" }, getDefaultOptions(), typeof (fontOption) === "string"
         ? { savePath: fontOption }
         : fontOption);
     const format = options.format;
@@ -198,13 +209,17 @@ function getOptionInfos(fontPath = "", fontOption) {
         nameFormat,
         logFormat,
         baseOption,
-        worker
+        worker,
+        fromCSS: options.fromCSS
     };
 }
-function getFileName(nameFormat, fontName, fontExt, index) {
+function fileNameInit(nameFormat, fontName, fontExt) {
     return nameFormat
         .replace("{NAME}", fontName)
-        .replace("{EXT}", fontExt)
+        .replace("{EXT}", fontExt);
+}
+function getFileName(initName, index) {
+    return initName
         .replace("{INDEX}", (typeof index === "number")
         ? index.toString()
         : (typeof index === "string")
@@ -216,8 +231,8 @@ function getConsoleLog(logFormat, origin, output) {
         .replace("{ORIGIN}", origin)
         .replace("{OUTPUT}", output);
 }
-function getSaveOption(dirPath, nameFormat, fontName, fontExt, index) {
-    const fileName = getFileName(nameFormat, fontName, fontExt, index);
+function getSaveOption(dirPath, initName, index) {
+    const fileName = getFileName(initName, index);
     return ("--output-file=" + (0, path_1.join)(dirPath, fileName));
 }
 function getSubsetOption(fontSubsetOption) {
@@ -233,19 +248,47 @@ function getSubsetOption(fontSubsetOption) {
     return "--glyphs=*";
 }
 function consoleLog(fontBase, fontName, fontExt, nameFormat, logFormat, index) {
+    const initName = fileNameInit(nameFormat, fontName, fontExt);
     if (logFormat !== "") {
-        const output = getFileName(nameFormat, fontName, fontExt, index);
+        const output = getFileName(initName, index);
         const log = getConsoleLog(logFormat, fontBase, output);
         console.log(log);
     }
+    return initName;
+}
+function getSrcInfo(src) {
+    const first = src.split(",").find((str) => {
+        return str.indexOf("url(") === 0;
+    });
+    if (typeof first === "undefined")
+        return {
+            base: "",
+            index: 0
+        };
+    const reStr = "url\\(";
+    const reMdl = "(.+?)";
+    const reEnd = "\\)";
+    const quote = "(\\\\?['\"])?";
+    const regex = new RegExp(reStr + quote + reMdl + quote + reEnd);
+    const urlContent = first.match(regex)[2];
+    const parsedURL = (0, path_1.parse)(urlContent);
+    return {
+        base: parsedURL.base,
+        index: parseInt(parsedURL.name.split(".").pop())
+    };
 }
 function fontRange(url = exports.targets.korean, fontPath = "", fontRangeOption) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { fontBase, fontName, fontExt, dirPath, nameFormat, logFormat, baseOption, worker } = getOptionInfos(fontPath, fontRangeOption);
-        consoleLog(fontBase, fontName, fontExt, nameFormat, logFormat, "n");
-        const ranges = yield getUnicodeRanges(dirPath, url);
-        const result = ranges.map((unicodes, i) => tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const saveOption = getSaveOption(dirPath, nameFormat, fontName, fontExt, i);
+        const { fontBase, fontName, fontExt, dirPath, nameFormat, logFormat, baseOption, worker, fromCSS } = getOptionInfos(fontPath, fontRangeOption);
+        const initName = consoleLog(fontBase, fontName, fontExt, nameFormat, logFormat, "n");
+        const ranges = yield parseCSS(dirPath, url);
+        const result = ranges.map(({ src, unicodes }, i) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const srcInfo = getSrcInfo(src);
+            const saveOption = getSaveOption(dirPath, (fromCSS === "srcName" && srcInfo.base !== "")
+                ? srcInfo.base
+                : initName, (fromCSS === "srcIndex" && srcInfo.base !== "")
+                ? srcInfo.index
+                : i);
             const unicodeRanges = unicodes.split(", ").join(",");
             const unicodeOption = "--unicodes=" + unicodeRanges;
             const options = [fontPath, saveOption, unicodeOption, ...baseOption];
@@ -259,9 +302,9 @@ exports.fontRange = fontRange;
 function fontSubset(fontPath = "", fontSubsetOption) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const { fontBase, fontName, fontExt, dirPath, nameFormat, logFormat, baseOption, worker } = getOptionInfos(fontPath, fontSubsetOption);
-        consoleLog(fontBase, fontName, fontExt, nameFormat, logFormat);
+        const initName = consoleLog(fontBase, fontName, fontExt, nameFormat, logFormat);
         const subsetOption = getSubsetOption(fontSubsetOption);
-        const saveOption = getSaveOption(dirPath, nameFormat, fontName, fontExt);
+        const saveOption = getSaveOption(dirPath, initName);
         const options = [fontPath, saveOption, subsetOption, ...baseOption];
         const result = yield worker.run(options);
         return result;
