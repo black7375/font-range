@@ -189,7 +189,7 @@ function formatOption(format) {
 }
 function getOptionInfos(fontPath = "", fontOption) {
     const options = Object.assign({ fromCSS: "default" }, getDefaultOptions(), typeof (fontOption) === "string"
-        ? { savePath: fontOption }
+        ? { saveDir: fontOption }
         : fontOption);
     const format = options.format;
     const pathInfo = (0, path_1.parse)(fontPath);
@@ -197,7 +197,7 @@ function getOptionInfos(fontPath = "", fontOption) {
     const fontBase = pathInfo.base;
     const fontName = pathInfo.name;
     const fontExt = "." + getFormat(format);
-    const dirPath = Object.prototype.hasOwnProperty.call(options, "savePath") ? options["savePath"] : fontDir;
+    const dirPath = Object.prototype.hasOwnProperty.call(options, "saveDir") ? options["saveDir"] : fontDir;
     const nameFormat = options.nameFormat;
     const logFormat = options.logFormat;
     const convertOption = formatOption(format);
@@ -289,7 +289,7 @@ function getSrcInfo(src) {
         index: parseInt(parsedURL.name.split(".").pop())
     };
 }
-function fontRange(url = exports.targets.korean, fontPath = "", fontRangeOption) {
+function fontRange(fontPath = "", url = exports.targets.korean, fontRangeOption) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const { fontBase, fontName, fontExt, dirPath, nameFormat, logFormat, baseOption, worker, fromCSS } = getOptionInfos(fontPath, fontRangeOption);
         const initName = yield initWithLog(dirPath, fontBase, fontName, fontExt, nameFormat, logFormat, "n");
@@ -327,7 +327,7 @@ function fontPipeExec(subsetTarget) {
     const { fontPath, fontPipeOption } = subsetTarget;
     return ((typeof fontPipeOption !== "undefined") &&
         (typeof fontPipeOption.cssFile !== "undefined"))
-        ? fontRange(fontPipeOption.cssFile, fontPath, fontPipeOption)
+        ? fontRange(fontPath, fontPipeOption.cssFile, fontPipeOption)
         : fontSubset(fontPath, fontPipeOption);
 }
 function fontPipe(subsetList) {

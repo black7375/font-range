@@ -174,7 +174,7 @@ export async function parseCSS(dirPath = "src", url = targets.korean) {
 
 // == Options - Basics =========================================================
 interface fontDefaultOptionI {
-  savePath:    string;
+  saveDir:     string;
   format:      format;
   nameFormat:  string;
   logFormat:   string;
@@ -191,7 +191,7 @@ interface fontSubsetOptionI extends fontDefaultOptionI {
 interface fontPipeOptionI extends fontRangeOptionI, fontSubsetOptionI {
   cssFile:     string;
 }
-type argOptionT<I>     = fontDefaultOptionI["savePath"] | Partial<I>;
+type argOptionT<I>     = fontDefaultOptionI["saveDir"] | Partial<I>;
 type fontRangeOptionT  = argOptionT<fontRangeOptionI>;
 type fontSubsetOptionT = argOptionT<fontSubsetOptionI>;
 type fontPipeOptionT   = Partial<fontPipeOptionI>;
@@ -212,7 +212,7 @@ export const defaultArgs = [
   "--name-languages=*"
 ];
 
-function getDefaultOptions(): RequiredByValueExcept<fontDefaultOptionI, "savePath"> {
+function getDefaultOptions(): RequiredByValueExcept<fontDefaultOptionI, "saveDir"> {
   return {
     format:      "woff2",
     nameFormat:  "{NAME}_{INDEX}{EXT}",
@@ -248,7 +248,7 @@ function getOptionInfos(fontPath = "", fontOption?: argOptionsT) {
     { fromCSS: "default" } satisfies Partial<fontRangeOptionI>,
     getDefaultOptions(),
     typeof(fontOption) === "string"
-      ? { savePath: fontOption }
+      ? { saveDir: fontOption }
       : fontOption
   );
 
@@ -259,7 +259,7 @@ function getOptionInfos(fontPath = "", fontOption?: argOptionsT) {
   const fontName = pathInfo.name;
   const fontExt  = "." + getFormat(format);
 
-  const dirPath    = Object.prototype.hasOwnProperty.call(options, "savePath") ? options["savePath"] : fontDir;
+  const dirPath    = Object.prototype.hasOwnProperty.call(options, "saveDir") ? options["saveDir"] : fontDir;
   const nameFormat = options.nameFormat;
   const logFormat  = options.logFormat;
 
@@ -377,7 +377,7 @@ function getSrcInfo(src: string) {
   }
 }
 
-export async function fontRange(url = targets.korean, fontPath = "", fontRangeOption?: fontRangeOptionT) {
+export async function fontRange(fontPath = "", url = targets.korean, fontRangeOption?: fontRangeOptionT) {
   const {
     fontBase,
     fontName,
@@ -451,7 +451,7 @@ function fontPipeExec(subsetTarget: fontPipeI) {
 
   return ((typeof fontPipeOption         !== "undefined") &&
           (typeof fontPipeOption.cssFile !== "undefined"))
-    ? fontRange(fontPipeOption.cssFile, fontPath, fontPipeOption)
+    ? fontRange(fontPath, fontPipeOption.cssFile, fontPipeOption)
     : fontSubset(fontPath, fontPipeOption);
 }
 

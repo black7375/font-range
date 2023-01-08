@@ -8,8 +8,8 @@ import { timeout, cssFile, textFile, fontPath, fontDir, fontName, unlink, rmdir 
 describe("FontRange Offline Feature", () => {
   const saveDir = join(fontDir, "offline");
   beforeAll(async () => {
-    return await fontRange(cssFile, fontPath, {
-      savePath: saveDir,
+    return await fontRange(fontPath, cssFile, {
+      saveDir,
       nameFormat: "{NAME}.subset.{INDEX}{EXT}"
     });
   }, timeout);
@@ -30,8 +30,8 @@ describe("FontRange Offline Feature", () => {
 describe("FontRange Options with srcIndex", () => {
   const saveDir = join(fontDir, "srcIndex");
   beforeAll(async () => {
-    return await fontRange(cssFile, fontPath, {
-      savePath:   saveDir,
+    return await fontRange(fontPath, cssFile, {
+      saveDir,
       nameFormat: "{NAME}.subset.{INDEX}{EXT}",
       logFormat:  "{ORIGIN} to {OUTPUT}",
       fromCSS:    "srcIndex"
@@ -53,8 +53,8 @@ describe("FontRange Options with srcIndex", () => {
 describe("FontRange srcName Option", () => {
   const saveDir = join(fontDir, "srcName");
   beforeAll(async () => {
-    return await fontRange(cssFile, fontPath, {
-      savePath:   saveDir,
+    return await fontRange(fontPath, cssFile, {
+      saveDir,
       fromCSS:    "srcName"
     });
   }, timeout);
@@ -75,7 +75,7 @@ describe("FontRange srcName Option", () => {
 describe("FontRange Online Feature", () => {
   const saveDir = join(fontDir, "online");
   beforeAll(async () => {
-    return await fontRange(targets.korean, fontPath, saveDir);
+    return await fontRange(fontPath, targets.korean, saveDir);
   }, timeout);
   afterAll(() => {
     rmdir(saveDir);
@@ -100,27 +100,27 @@ describe("FontSubset Format & Glyph Feature", () => {
   const saveDir = join(fontDir, "format");
   beforeAll(async () => {
     const font1 = await fontSubset(fontPath, {
-      savePath: saveDir,
+      saveDir,
       text:     "abcd",
       format:   "otf"
     });
     const font2 = await fontSubset(fontPath, {
-      savePath: saveDir,
+      saveDir,
       text:     "abcd",
       format:   "ttf"
     });
     const font3 = await fontSubset(fontPath, {
-      savePath: saveDir,
+      saveDir,
       text:    "abcd",
       format:  "woff2"
     });
     const font4 = await fontSubset(fontPath, {
-      savePath: saveDir,
+      saveDir,
       text:    "abcd",
       format:  "woff"
     });
     const font5 = await fontSubset(fontPath, {
-      savePath: saveDir,
+      saveDir,
       text:     "abcd",
       format:   "woff-zopfli"
     });
