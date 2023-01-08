@@ -164,8 +164,8 @@ describe("FontPipe Feature", () => {
   beforeAll(async () => {
     const pipe = [
       { fontPath },
-      { fontPath, fontPipeOption: { textFile, nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } },
-      { fontPath, fontPipeOption: { cssFile,  nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } }
+      { fontPath, option: { textFile, nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } },
+      { fontPath, option: { cssFile,  nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } }
     ];
     return await fontPipe(pipe);
   }, timeout * 3);
@@ -193,9 +193,9 @@ describe("FontPipe Shard with Args", () => {
   const saveDir = join(fontDir, "shardArgs");
   beforeAll(async () => {
     const pipe = [
-      { fontPath, fontPipeOption: { saveDir                                                   } },
-      { fontPath, fontPipeOption: { saveDir, textFile, nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } },
-      { fontPath, fontPipeOption: { saveDir, cssFile,  nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } }
+      { fontPath, option: { saveDir                                                   } },
+      { fontPath, option: { saveDir, textFile, nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } },
+      { fontPath, option: { saveDir, cssFile,  nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } }
     ];
     return await fontPipe(pipe, "1/2");
   }, timeout);
@@ -221,9 +221,9 @@ describe("FontPipe Shard with Env", () => {
       SHARD: "2/2"
     };
     const pipe = [
-      { fontPath, fontPipeOption: { saveDir                                                   } },
-      { fontPath, fontPipeOption: { saveDir, textFile, nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } },
-      { fontPath, fontPipeOption: { saveDir, cssFile,  nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } }
+      { fontPath, option: { saveDir                                                   } },
+      { fontPath, option: { saveDir, textFile, nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } },
+      { fontPath, option: { saveDir, cssFile,  nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } }
     ];
     return await fontPipe(pipe);
   }, timeout);
@@ -245,9 +245,9 @@ describe("FontPipe Shard with Env", () => {
 describe("FontPipe Shard Error", () => {
   const saveDir = join(fontDir, "error");
   const pipe = [
-    { fontPath, fontPipeOption: { saveDir                                                   } },
-    { fontPath, fontPipeOption: { saveDir, textFile, nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } },
-    { fontPath, fontPipeOption: { saveDir, cssFile,  nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } }
+    { fontPath, option: { saveDir                                                   } },
+    { fontPath, option: { saveDir, textFile, nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } },
+    { fontPath, option: { saveDir, cssFile,  nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } }
   ];
   const run = async (shard: string) => await fontPipe(pipe, { shard });
   afterAll(() => {

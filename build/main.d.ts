@@ -38,7 +38,7 @@ export declare function fontRange(fontPath?: string, url?: string, fontRangeOpti
 export declare function fontSubset(fontPath?: string, fontSubsetOption?: FontSubsetOptionT): Promise<import("@esm2cjs/execa").ExecaSyncReturnValue<string>>;
 interface FontPipeI {
     fontPath: string;
-    fontPipeOption?: FontPipeOptionT;
+    option?: FontPipeOptionT;
 }
 interface ShardI {
     shard: string;

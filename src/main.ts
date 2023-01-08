@@ -443,15 +443,15 @@ export async function fontSubset(fontPath = "", fontSubsetOption?: FontSubsetOpt
 // == Pipeline =================================================================
 interface FontPipeI {
   fontPath: string;
-  fontPipeOption?: FontPipeOptionT;
+  option?:  FontPipeOptionT;
 }
 function fontPipeExec(subsetTarget: FontPipeI) {
-  const { fontPath, fontPipeOption } = subsetTarget;
+  const { fontPath, option } = subsetTarget;
 
-  return ((typeof fontPipeOption         !== "undefined") &&
-          (typeof fontPipeOption.cssFile !== "undefined"))
-    ? fontRange(fontPath, fontPipeOption.cssFile, fontPipeOption)
-    : fontSubset(fontPath, fontPipeOption);
+  return ((typeof option         !== "undefined") &&
+          (typeof option.cssFile !== "undefined"))
+    ? fontRange(fontPath, option.cssFile, option)
+    : fontSubset(fontPath, option);
 }
 
 function shardNum(shardStr: string, content: string) {

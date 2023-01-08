@@ -324,11 +324,11 @@ function fontSubset(fontPath = "", fontSubsetOption) {
 }
 exports.fontSubset = fontSubset;
 function fontPipeExec(subsetTarget) {
-    const { fontPath, fontPipeOption } = subsetTarget;
-    return ((typeof fontPipeOption !== "undefined") &&
-        (typeof fontPipeOption.cssFile !== "undefined"))
-        ? fontRange(fontPath, fontPipeOption.cssFile, fontPipeOption)
-        : fontSubset(fontPath, fontPipeOption);
+    const { fontPath, option } = subsetTarget;
+    return ((typeof option !== "undefined") &&
+        (typeof option.cssFile !== "undefined"))
+        ? fontRange(fontPath, option.cssFile, option)
+        : fontSubset(fontPath, option);
 }
 function shardNum(shardStr, content) {
     const num = Math.abs(parseInt(shardStr, 10));
