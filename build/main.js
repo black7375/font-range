@@ -361,8 +361,8 @@ function fontPipe(subsetList, shard) {
     const shardEnd = shardSize * index;
     if (shardEnv !== "1/1") {
         const shardMsg = shardFormat
-            .replace("{START}", shardStart.toString())
-            .replace("{END}", shardEnd.toString());
+            .replace("{START}", index.toString())
+            .replace("{END}", total.toString());
         console.log(shardMsg);
     }
     const result = subsetList

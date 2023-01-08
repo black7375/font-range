@@ -173,30 +173,30 @@ export async function parseCSS(dirPath = "src", url = targets.korean) {
 }
 
 // == Options - Basics =========================================================
-interface fontDefaultOptionI {
+interface FontDefaultOptionI {
   saveDir:     string;
-  format:      format;
+  format:      Format;
   nameFormat:  string;
   logFormat:   string;
   defaultArgs: string[];
   etcArgs:     string[];
 }
-interface fontRangeOptionI extends fontDefaultOptionI {
+interface FontRangeOptionI extends FontDefaultOptionI {
   fromCSS:    "default" | "srcIndex" | "srcName";
 }
-interface fontSubsetOptionI extends fontDefaultOptionI {
+interface FontSubsetOptionI extends FontDefaultOptionI {
   textFile:    string;
   text:        string;
 }
-interface fontPipeOptionI extends fontRangeOptionI, fontSubsetOptionI {
+interface FontPipeOptionI extends FontRangeOptionI, FontSubsetOptionI {
   cssFile:     string;
 }
-type argOptionT<I>     = fontDefaultOptionI["saveDir"] | Partial<I>;
-type fontRangeOptionT  = argOptionT<fontRangeOptionI>;
-type fontSubsetOptionT = argOptionT<fontSubsetOptionI>;
-type fontPipeOptionT   = Partial<fontPipeOptionI>;
-type argOptionsT       = fontRangeOptionT | fontSubsetOptionT | fontPipeOptionT;
-type format            = "otf" | "ttf" | "woff2" | "woff" | "woff-zopfli";
+type ArgOptionT<I>     = FontDefaultOptionI["saveDir"] | Partial<I>;
+type FontRangeOptionT  = ArgOptionT<FontRangeOptionI>;
+type FontSubsetOptionT = ArgOptionT<FontSubsetOptionI>;
+type FontPipeOptionT   = Partial<FontPipeOptionI>;
+type ArgOptionsT       = FontRangeOptionT | FontSubsetOptionT | FontPipeOptionT;
+type Format            = "otf" | "ttf" | "woff2" | "woff" | "woff-zopfli";
 
 export const defaultArgs = [
   "--layout-features=*",
@@ -212,7 +212,7 @@ export const defaultArgs = [
   "--name-languages=*"
 ];
 
-function getDefaultOptions(): RequiredByValueExcept<fontDefaultOptionI, "saveDir"> {
+function getDefaultOptions(): RequiredByValueExcept<FontDefaultOptionI, "saveDir"> {
   return {
     format:      "woff2",
     nameFormat:  "{NAME}_{INDEX}{EXT}",
@@ -223,7 +223,7 @@ function getDefaultOptions(): RequiredByValueExcept<fontDefaultOptionI, "saveDir
 }
 
 // == Options - Get Info =======================================================
-function getFormat(format: format) {
+function getFormat(format: Format) {
   switch(format) {
     case "otf":   return "otf";
     case "ttf":   return "ttf";
@@ -233,7 +233,7 @@ function getFormat(format: format) {
   }
 }
 
-function formatOption(format: format) {
+function formatOption(format: Format) {
   const formatName = getFormat(format);
 
   if(format === "otf" || format === "ttf") return [""];
@@ -243,9 +243,9 @@ function formatOption(format: format) {
   ];
 }
 
-function getOptionInfos(fontPath = "", fontOption?: argOptionsT) {
-  const options: fontPipeOptionT = Object.assign(
-    { fromCSS: "default" } satisfies Partial<fontRangeOptionI>,
+function getOptionInfos(fontPath = "", fontOption?: ArgOptionsT) {
+  const options: FontPipeOptionT = Object.assign(
+    { fromCSS: "default" } satisfies Partial<FontRangeOptionI>,
     getDefaultOptions(),
     typeof(fontOption) === "string"
       ? { saveDir: fontOption }
@@ -318,7 +318,7 @@ function getSaveOption(dirPath: string, initName: string, index?: number) {
   return ("--output-file=" + join(dirPath, fileName));
 }
 
-function getSubsetOption(fontSubsetOption?: fontSubsetOptionT) {
+function getSubsetOption(fontSubsetOption?: FontSubsetOptionT) {
   if(
     typeof fontSubsetOption !== "undefined" &&
     typeof fontSubsetOption !== "string"
@@ -377,7 +377,7 @@ function getSrcInfo(src: string) {
   }
 }
 
-export async function fontRange(fontPath = "", url = targets.korean, fontRangeOption?: fontRangeOptionT) {
+export async function fontRange(fontPath = "", url = targets.korean, fontRangeOption?: FontRangeOptionT) {
   const {
     fontBase,
     fontName,
@@ -417,7 +417,7 @@ export async function fontRange(fontPath = "", url = targets.korean, fontRangeOp
   return Promise.all(result);
 }
 
-export async function fontSubset(fontPath = "", fontSubsetOption?: fontSubsetOptionT) {
+export async function fontSubset(fontPath = "", fontSubsetOption?: FontSubsetOptionT) {
   const {
     fontBase,
     fontName,
@@ -441,11 +441,11 @@ export async function fontSubset(fontPath = "", fontSubsetOption?: fontSubsetOpt
 }
 
 // == Pipeline =================================================================
-interface fontPipeI {
+interface FontPipeI {
   fontPath: string;
-  fontPipeOption?: fontPipeOptionT;
+  fontPipeOption?: FontPipeOptionT;
 }
-function fontPipeExec(subsetTarget: fontPipeI) {
+function fontPipeExec(subsetTarget: FontPipeI) {
   const { fontPath, fontPipeOption } = subsetTarget;
 
   return ((typeof fontPipeOption         !== "undefined") &&
@@ -478,7 +478,7 @@ interface ShardI {
   shardFormat: string;
 }
 type ShardT = ShardI["shard"] | Partial<ShardI>
-export function fontPipe(subsetList: fontPipeI[], shard?: ShardT) {
+export function fontPipe(subsetList: FontPipeI[], shard?: ShardT) {
   const shardEnv    = (typeof shard === "object" && typeof shard.shard       === "string")
     ? shard.shard
     : (typeof shard === "object" || typeof shard === "undefined")
