@@ -330,8 +330,44 @@ function fontPipeExec(subsetTarget) {
         ? fontRange(fontPath, fontPipeOption.cssFile, fontPipeOption)
         : fontSubset(fontPath, fontPipeOption);
 }
-function fontPipe(subsetList) {
-    const result = subsetList.map(fontPipeExec);
+function shardNum(shardStr, content) {
+    const num = Math.abs(parseInt(shardStr, 10));
+    if (isNaN(num) || num <= 0) {
+        throw new Error("<" + content + "> must be a positive number");
+    }
+    return num;
+}
+function getShardInfo(shardEnv) {
+    const [indexStr, totalStr] = shardEnv.split("/");
+    const index = shardNum(indexStr, "index");
+    const total = shardNum(totalStr, "total");
+    if (index > total) {
+        throw new Error("<index> must be less then <total>");
+    }
+    return [index, total];
+}
+function fontPipe(subsetList, shard) {
+    const shardEnv = (typeof shard === "object" && typeof shard.shard === "string")
+        ? shard.shard
+        : (typeof shard === "object" || typeof shard === "undefined")
+            ? process.env.SHARD || "1/1"
+            : shard;
+    const shardFormat = (typeof shard === "object" && typeof shard.shardFormat === "string")
+        ? shard.shardFormat
+        : "== {START}/{END} ==========";
+    const [index, total] = getShardInfo(shardEnv);
+    const shardSize = Math.ceil(subsetList.length / total);
+    const shardStart = shardSize * (index - 1);
+    const shardEnd = shardSize * index;
+    if (shardEnv !== "1/1") {
+        const shardMsg = shardFormat
+            .replace("{START}", shardStart.toString())
+            .replace("{END}", shardEnd.toString());
+        console.log(shardMsg);
+    }
+    const result = subsetList
+        .slice(shardStart, shardEnd)
+        .map(fontPipeExec);
     return Promise.all(result);
 }
 exports.fontPipe = fontPipe;

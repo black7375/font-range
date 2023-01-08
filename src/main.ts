@@ -445,7 +445,6 @@ interface fontPipeI {
   fontPath: string;
   fontPipeOption?: fontPipeOptionT;
 }
-
 function fontPipeExec(subsetTarget: fontPipeI) {
   const { fontPath, fontPipeOption } = subsetTarget;
 
@@ -455,7 +454,54 @@ function fontPipeExec(subsetTarget: fontPipeI) {
     : fontSubset(fontPath, fontPipeOption);
 }
 
-export function fontPipe(subsetList: fontPipeI[]) {
-  const result = subsetList.map(fontPipeExec);
+function shardNum(shardStr: string, content: string) {
+  const num = Math.abs(parseInt(shardStr, 10));
+
+  if(isNaN(num) || num <= 0) {
+    throw new Error("<" + content + "> must be a positive number");
+  }
+  return num;
+}
+function getShardInfo(shardEnv: string) {
+  const [indexStr, totalStr] = shardEnv.split("/");
+  const index = shardNum(indexStr, "index");
+  const total = shardNum(totalStr, "total");
+
+  if(index > total) {
+    throw new Error("<index> must be less then <total>")
+  }
+  return [index, total] as const;
+}
+
+interface ShardI {
+  shard:       string;
+  shardFormat: string;
+}
+type ShardT = ShardI["shard"] | Partial<ShardI>
+export function fontPipe(subsetList: fontPipeI[], shard?: ShardT) {
+  const shardEnv    = (typeof shard === "object" && typeof shard.shard       === "string")
+    ? shard.shard
+    : (typeof shard === "object" || typeof shard === "undefined")
+    ? process.env.SHARD || "1/1"
+    : shard;
+  const shardFormat = (typeof shard === "object" && typeof shard.shardFormat === "string")
+    ? shard.shardFormat
+    : "== {START}/{END} ==========";
+
+  const [index, total] = getShardInfo(shardEnv);
+  const shardSize  = Math.ceil(subsetList.length / total);
+  const shardStart = shardSize * (index - 1);
+  const shardEnd   = shardSize * index;
+
+  if(shardEnv !== "1/1") {
+    const shardMsg = shardFormat
+      .replace("{START}", index.toString())
+      .replace("{END}",   total.toString());
+    console.log(shardMsg);
+  }
+
+  const result = subsetList
+    .slice(shardStart, shardEnd)
+    .map(fontPipeExec);
   return Promise.all(result);
 }

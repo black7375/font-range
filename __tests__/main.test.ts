@@ -160,13 +160,13 @@ describe("FontSubset Glyphs File Feature", () => {
   });
 });
 
-describe("FontSubset Pipeline Feature", () => {
+describe("FontPipe Feature", () => {
   beforeAll(async () => {
     const pipe = [
       { fontPath },
       { fontPath, fontPipeOption: { textFile, nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } },
       { fontPath, fontPipeOption: { cssFile,  nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } }
-    ]
+    ];
     return await fontPipe(pipe);
   }, timeout * 3);
 
@@ -186,5 +186,83 @@ describe("FontSubset Pipeline Feature", () => {
       expect(existsSync(eachFontPath)).toBe(true);
       unlink(eachFontPath);
     }
+  });
+});
+
+describe("FontPipe Shard with Args", () => {
+  const saveDir = join(fontDir, "shardArgs");
+  beforeAll(async () => {
+    const pipe = [
+      { fontPath, fontPipeOption: { saveDir                                                   } },
+      { fontPath, fontPipeOption: { saveDir, textFile, nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } },
+      { fontPath, fontPipeOption: { saveDir, cssFile,  nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } }
+    ];
+    return await fontPipe(pipe, "1/2");
+  }, timeout);
+  afterAll(() => {
+    rmdir(saveDir);
+  });
+
+  it("Font Created Check", async () => {
+    const fontFile1 = join(saveDir, fontName + "_" + ".woff2");
+    const fontFile2 = join(saveDir, fontName + ".pipe." + ".woff2");
+
+    expect(existsSync(fontFile1)).toBe(true);
+    expect(existsSync(fontFile2)).toBe(true);
+  });
+});
+
+describe("FontPipe Shard with Env", () => {
+  const saveDir = join(fontDir, "shardEnv");
+  const OLD_ENV = process.env;
+  beforeAll(async () => {
+    process.env = {
+      ...OLD_ENV, 
+      SHARD: "2/2"
+    };
+    const pipe = [
+      { fontPath, fontPipeOption: { saveDir                                                   } },
+      { fontPath, fontPipeOption: { saveDir, textFile, nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } },
+      { fontPath, fontPipeOption: { saveDir, cssFile,  nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } }
+    ];
+    return await fontPipe(pipe);
+  }, timeout);
+  afterAll(() => {
+    process.env = OLD_ENV;
+    rmdir(saveDir);
+  });
+
+  it("Font Created Check", async () => {
+    const parsed  = await parseCSS(fontDir, cssFile);
+    const parsedL = parsed.length;
+    for (let counts = 0; counts < parsedL; counts++) {
+      const eachFontPath = join(saveDir, fontName + ".pipe." + counts + ".woff2");
+      expect(existsSync(eachFontPath)).toBe(true);
+    }
+  });
+});
+
+describe("FontPipe Shard Error", () => {
+  const saveDir = join(fontDir, "error");
+  const pipe = [
+    { fontPath, fontPipeOption: { saveDir                                                   } },
+    { fontPath, fontPipeOption: { saveDir, textFile, nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } },
+    { fontPath, fontPipeOption: { saveDir, cssFile,  nameFormat: "{NAME}.pipe.{INDEX}{EXT}" } }
+  ];
+  const run = async (shard: string) => await fontPipe(pipe, { shard });
+  afterAll(() => {
+    if(existsSync(saveDir)) {
+      rmdir(saveDir);
+    }
+  });
+
+  it("Number parsing", async() => {
+    await expect(run("a120")).rejects.toThrow("<index> must be a positive number");
+    await expect(run("a/20")).rejects.toThrow("<index> must be a positive number");
+    await expect(run("0/20")).rejects.toThrow("<index> must be a positive number");
+    await expect(run("1/a2")).rejects.toThrow("<total> must be a positive number");
+  });
+  it("Index size", async() => {
+    await expect(run("22/2")).rejects.toThrow("<index> must be less then <total>");
   });
 });

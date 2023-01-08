@@ -40,5 +40,10 @@ interface fontPipeI {
     fontPath: string;
     fontPipeOption?: fontPipeOptionT;
 }
-export declare function fontPipe(subsetList: fontPipeI[]): Promise<(import("@esm2cjs/execa").ExecaSyncReturnValue<string> | import("@esm2cjs/execa").ExecaSyncReturnValue<string>[])[]>;
+interface ShardI {
+    shard: string;
+    shardFormat: string;
+}
+type ShardT = ShardI["shard"] | Partial<ShardI>;
+export declare function fontPipe(subsetList: fontPipeI[], shard?: ShardT): Promise<(import("@esm2cjs/execa").ExecaSyncReturnValue<string> | import("@esm2cjs/execa").ExecaSyncReturnValue<string>[])[]>;
 export {};
