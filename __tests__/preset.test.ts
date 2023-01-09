@@ -27,18 +27,37 @@ describe("Preset Check", () => {
 });
 
 describe("Pyftsubset Check", () => {
-  const fontFile = join(fontDir, fontName + ".preset.woff2");
+  it("Subset check with no Log", async () => {
+    const fontFile = join(fontDir, fontName + ".preset.woff2");
+    console.log = jest.fn();
 
-  beforeAll(() => {
-    return subset([
+    subset({options: [
       fontPath,
       "--output-file=" + fontFile,
       "--text-file=" + textFile,
       ...defaultArgs
-    ]);
+    ]});
+
+    expect(console.log).not.toHaveBeenCalled();
+    expect(existsSync(fontFile)).toBe(true);
+    unlink(fontFile);
   });
 
-  it("Subset check", async () => {
+  it("Subset check with log", async () => {
+    const fontFile = join(fontDir, fontName + ".log.woff2");
+    console.log = jest.fn();
+
+    subset({
+      options: [
+        fontPath,
+        "--output-file=" + fontFile,
+        "--text-file=" + textFile,
+        ...defaultArgs
+      ],
+      log: "== pyftsubset run =="
+    });
+
+    expect(console.log).toHaveBeenCalledWith("== pyftsubset run ==");
     expect(existsSync(fontFile)).toBe(true);
     unlink(fontFile);
   });

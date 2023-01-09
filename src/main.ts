@@ -243,7 +243,28 @@ function formatOption(format: Format) {
   ];
 }
 
-function getOptionInfos(fontPath = "", fontOption?: ArgOptionsT) {
+function fileNameInit(nameFormat: string, fontName: string, fontExt: string) {
+  return nameFormat
+    .replace( "{NAME}", fontName)
+    .replace(  "{EXT}", fontExt );
+}
+function getFileName(initName: string, index?: number | string) {
+  return initName
+    .replace("{INDEX}",
+        (typeof index === "number")
+      ? index.toString()
+      : (typeof index === "string")
+      ? index
+      : ""
+    );
+}
+function getConsoleLog(logFormat: string, origin: string, output: string) {
+  return logFormat
+    .replace("{ORIGIN}", origin)
+    .replace("{OUTPUT}", output);
+}
+
+function getOptionInfos(fontPath = "", fontOption?: ArgOptionsT, indexIndicate = "") {
   const options: FontPipeOptionT = Object.assign(
     { fromCSS: "default" } satisfies Partial<FontRangeOptionI>,
     getDefaultOptions(),
@@ -263,6 +284,10 @@ function getOptionInfos(fontPath = "", fontOption?: ArgOptionsT) {
   const nameFormat = options.nameFormat;
   const logFormat  = options.logFormat;
 
+  const initName = fileNameInit(nameFormat, fontName, fontExt);
+  const output   = getFileName(initName, indexIndicate);
+  const logMsg   = getConsoleLog(logFormat, fontBase, output);
+
   const convertOption = formatOption(format);
   const defaultOption = options.defaultArgs;
   const etcOption     = options.etcArgs;
@@ -275,13 +300,9 @@ function getOptionInfos(fontPath = "", fontOption?: ArgOptionsT) {
   const worker = Worker.getInstance();
 
   return {
-    fontBase,
-    fontName,
-    fontExt,
-
     dirPath,
-    nameFormat,
-    logFormat,
+    initName,
+    logMsg,
 
     baseOption,
     worker,
@@ -291,65 +312,6 @@ function getOptionInfos(fontPath = "", fontOption?: ArgOptionsT) {
 }
 
 // == Options - Others =========================================================
-function fileNameInit(nameFormat: string, fontName: string, fontExt: string) {
-  return nameFormat
-    .replace( "{NAME}", fontName)
-    .replace(  "{EXT}", fontExt );
-}
-function getFileName(initName: string, index?: number | string) {
-  return initName
-    .replace("{INDEX}",
-        (typeof index === "number")
-      ? index.toString()
-      : (typeof index === "string")
-      ? index
-      : ""
-    );
-}
-
-function getConsoleLog(logFormat: string, origin: string, output: string) {
-  return logFormat
-    .replace("{ORIGIN}", origin)
-    .replace("{OUTPUT}", output);
-}
-
-function getSaveOption(dirPath: string, initName: string, index?: number) {
-  const fileName = getFileName(initName, index);
-  return ("--output-file=" + join(dirPath, fileName));
-}
-
-function getSubsetOption(fontSubsetOption?: FontSubsetOptionT) {
-  if(
-    typeof fontSubsetOption !== "undefined" &&
-    typeof fontSubsetOption !== "string"
-  ) {
-    if("textFile" in fontSubsetOption) {
-      return ("--text-file=" + fontSubsetOption.textFile);
-    }
-    if("text"     in fontSubsetOption) {
-      return ("--text="      + fontSubsetOption.text    );
-    }
-  }
-  return "--glyphs=*";
-}
-
-// == Main =====================================================================
-async function initWithLog(
-  dirPath: string, fontBase: string,   fontName:  string, fontExt: string,
-  nameFormat: string, logFormat: string,
-  index?: number | string
-  ) {
-  const initName = fileNameInit(nameFormat, fontName, fontExt);
-
-  if(!existsSync(dirPath)) await mkdir(dirPath);
-  if(logFormat !== "") {
-    const output = getFileName(initName, index);
-    const log    = getConsoleLog(logFormat, fontBase, output);
-    console.log(log);
-  }
-  return initName;
-}
-
 function getSrcInfo(src: string) {
   const first = src.split(",").find((str) => {
     return str.indexOf("url(") === 0;
@@ -374,25 +336,41 @@ function getSrcInfo(src: string) {
     index: parseInt(
       parsedURL.name.split(".").pop()  // google font index at latest
     )
-  }
+  };
 }
 
+function getSaveOption(dirPath: string, initName: string, index?: number) {
+  const fileName = getFileName(initName, index);
+  return ("--output-file=" + join(dirPath, fileName));
+}
+
+function getSubsetOption(fontSubsetOption?: FontSubsetOptionT) {
+  if(
+    typeof fontSubsetOption !== "undefined" &&
+    typeof fontSubsetOption !== "string"
+  ) {
+    if("textFile" in fontSubsetOption) {
+      return ("--text-file=" + fontSubsetOption.textFile);
+    }
+    if("text"     in fontSubsetOption) {
+      return ("--text="      + fontSubsetOption.text    );
+    }
+  }
+  return "--glyphs=*";
+}
+
+// == Main =====================================================================
 export async function fontRange(fontPath = "", url = targets.korean, fontRangeOption?: FontRangeOptionT) {
   const {
-    fontBase,
-    fontName,
-    fontExt,
-
     dirPath,
-    nameFormat,
-    logFormat,
+    initName,
+    logMsg,
 
     baseOption,
     worker,
 
     fromCSS
-  } = getOptionInfos(fontPath, fontRangeOption);
-  const initName = await initWithLog(dirPath, fontBase, fontName, fontExt, nameFormat, logFormat, "n");
+  } = getOptionInfos(fontPath, fontRangeOption, "n");
 
   const ranges = await parseCSS(dirPath, url);
   const result = ranges.map(async ({src, unicodes}, i) => {
@@ -410,7 +388,8 @@ export async function fontRange(fontPath = "", url = targets.korean, fontRangeOp
     const unicodeOption = "--unicodes=" + unicodeRanges;
 
     const options = [fontPath, saveOption, unicodeOption, ...baseOption];
-    const result: WorkerRT = await worker.run(options);
+    const logInfo = (i === 0) ? logMsg : "";
+    const result: WorkerRT = await worker.run({ options, log: logInfo});
     return result;
   });
 
@@ -419,24 +398,20 @@ export async function fontRange(fontPath = "", url = targets.korean, fontRangeOp
 
 export async function fontSubset(fontPath = "", fontSubsetOption?: FontSubsetOptionT) {
   const {
-    fontBase,
-    fontName,
-    fontExt,
-
     dirPath,
-    nameFormat,
-    logFormat,
+    initName,
+    logMsg,
 
     baseOption,
     worker
   } = getOptionInfos(fontPath, fontSubsetOption);
+  if(!existsSync(dirPath)) await mkdir(dirPath);
 
-  const initName     = await initWithLog(dirPath, fontBase, fontName, fontExt, nameFormat, logFormat);
   const subsetOption = getSubsetOption(fontSubsetOption);
   const saveOption   = getSaveOption(dirPath, initName);
 
   const options = [fontPath, saveOption, subsetOption, ...baseOption];
-  const result: WorkerRT = await worker.run(options);
+  const result: WorkerRT = await worker.run({ options, log: logMsg});
   return result;
 }
 
