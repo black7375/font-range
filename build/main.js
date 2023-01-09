@@ -13,7 +13,7 @@ class Worker {
     static getInstance() {
         if (!Worker.instance) {
             Worker.instance = new piscina_1.default({
-                filename: (0, path_1.join)(process.cwd(), "build", "worker.js")
+                filename: (0, path_1.join)(__dirname, "../", "build", "worker.js")
             });
         }
         return Worker.instance;
