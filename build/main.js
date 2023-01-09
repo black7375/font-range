@@ -307,7 +307,7 @@ function fontRange(fontPath = "", url = exports.targets.korean, fontRangeOption)
             const result = yield worker.run(options);
             return result;
         }));
-        return Promise.all(result);
+        return yield Promise.all(result);
     });
 }
 exports.fontRange = fontRange;
@@ -347,27 +347,29 @@ function getShardInfo(shardEnv) {
     return [index, total];
 }
 function fontPipe(subsetList, shard) {
-    const shardEnv = (typeof shard === "object" && typeof shard.shard === "string")
-        ? shard.shard
-        : (typeof shard === "object" || typeof shard === "undefined")
-            ? process.env.SHARD || "1/1"
-            : shard;
-    const shardFormat = (typeof shard === "object" && typeof shard.shardFormat === "string")
-        ? shard.shardFormat
-        : "== {START}/{END} ==========";
-    const [index, total] = getShardInfo(shardEnv);
-    const shardSize = Math.ceil(subsetList.length / total);
-    const shardStart = shardSize * (index - 1);
-    const shardEnd = shardSize * index;
-    if (shardEnv !== "1/1") {
-        const shardMsg = shardFormat
-            .replace("{START}", index.toString())
-            .replace("{END}", total.toString());
-        console.log(shardMsg);
-    }
-    const result = subsetList
-        .slice(shardStart, shardEnd)
-        .map(fontPipeExec);
-    return Promise.all(result);
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const shardEnv = (typeof shard === "object" && typeof shard.shard === "string")
+            ? shard.shard
+            : (typeof shard === "object" || typeof shard === "undefined")
+                ? process.env.SHARD || "1/1"
+                : shard;
+        const shardFormat = (typeof shard === "object" && typeof shard.shardFormat === "string")
+            ? shard.shardFormat
+            : "== {START}/{END} ==========";
+        const [index, total] = getShardInfo(shardEnv);
+        const shardSize = Math.ceil(subsetList.length / total);
+        const shardStart = shardSize * (index - 1);
+        const shardEnd = shardSize * index;
+        if (shardEnv !== "1/1") {
+            const shardMsg = shardFormat
+                .replace("{START}", index.toString())
+                .replace("{END}", total.toString());
+            console.log(shardMsg);
+        }
+        const result = subsetList
+            .slice(shardStart, shardEnd)
+            .map(fontPipeExec);
+        return yield Promise.all(result);
+    });
 }
 exports.fontPipe = fontPipe;

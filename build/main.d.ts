@@ -10,7 +10,7 @@ interface BlockI {
     unicodes: string;
 }
 export declare function parseCSS(dirPath?: string, url?: string): Promise<BlockI[]>;
-interface FontDefaultOptionI {
+export interface FontDefaultOptionI {
     saveDir: string;
     format: Format;
     nameFormat: string;
@@ -18,14 +18,14 @@ interface FontDefaultOptionI {
     defaultArgs: string[];
     etcArgs: string[];
 }
-interface FontRangeOptionI extends FontDefaultOptionI {
+export interface FontRangeOptionI extends FontDefaultOptionI {
     fromCSS: "default" | "srcIndex" | "srcName";
 }
-interface FontSubsetOptionI extends FontDefaultOptionI {
+export interface FontSubsetOptionI extends FontDefaultOptionI {
     textFile: string;
     text: string;
 }
-interface FontPipeOptionI extends FontRangeOptionI, FontSubsetOptionI {
+export interface FontPipeOptionI extends FontRangeOptionI, FontSubsetOptionI {
     cssFile: string;
 }
 type ArgOptionT<I> = FontDefaultOptionI["saveDir"] | Partial<I>;
@@ -36,7 +36,7 @@ type Format = "otf" | "ttf" | "woff2" | "woff" | "woff-zopfli";
 export declare const defaultArgs: string[];
 export declare function fontRange(fontPath?: string, url?: string, fontRangeOption?: FontRangeOptionT): Promise<import("@esm2cjs/execa").ExecaSyncReturnValue<string>[]>;
 export declare function fontSubset(fontPath?: string, fontSubsetOption?: FontSubsetOptionT): Promise<import("@esm2cjs/execa").ExecaSyncReturnValue<string>>;
-interface FontPipeI {
+export interface FontPipeI {
     fontPath: string;
     option?: FontPipeOptionT;
 }

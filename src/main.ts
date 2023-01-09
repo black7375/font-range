@@ -173,7 +173,7 @@ export async function parseCSS(dirPath = "src", url = targets.korean) {
 }
 
 // == Options - Basics =========================================================
-interface FontDefaultOptionI {
+export interface FontDefaultOptionI {
   saveDir:     string;
   format:      Format;
   nameFormat:  string;
@@ -181,14 +181,14 @@ interface FontDefaultOptionI {
   defaultArgs: string[];
   etcArgs:     string[];
 }
-interface FontRangeOptionI extends FontDefaultOptionI {
+export interface FontRangeOptionI extends FontDefaultOptionI {
   fromCSS:    "default" | "srcIndex" | "srcName";
 }
-interface FontSubsetOptionI extends FontDefaultOptionI {
+export interface FontSubsetOptionI extends FontDefaultOptionI {
   textFile:    string;
   text:        string;
 }
-interface FontPipeOptionI extends FontRangeOptionI, FontSubsetOptionI {
+export interface FontPipeOptionI extends FontRangeOptionI, FontSubsetOptionI {
   cssFile:     string;
 }
 type ArgOptionT<I>     = FontDefaultOptionI["saveDir"] | Partial<I>;
@@ -414,7 +414,7 @@ export async function fontRange(fontPath = "", url = targets.korean, fontRangeOp
     return result;
   });
 
-  return Promise.all(result);
+  return await Promise.all(result);
 }
 
 export async function fontSubset(fontPath = "", fontSubsetOption?: FontSubsetOptionT) {
@@ -441,7 +441,7 @@ export async function fontSubset(fontPath = "", fontSubsetOption?: FontSubsetOpt
 }
 
 // == Pipeline =================================================================
-interface FontPipeI {
+export interface FontPipeI {
   fontPath: string;
   option?:  FontPipeOptionT;
 }
@@ -478,7 +478,7 @@ interface ShardI {
   shardFormat: string;
 }
 type ShardT = ShardI["shard"] | Partial<ShardI>
-export function fontPipe(subsetList: FontPipeI[], shard?: ShardT) {
+export async function fontPipe(subsetList: FontPipeI[], shard?: ShardT) {
   const shardEnv    = (typeof shard === "object" && typeof shard.shard       === "string")
     ? shard.shard
     : (typeof shard === "object" || typeof shard === "undefined")
@@ -503,5 +503,5 @@ export function fontPipe(subsetList: FontPipeI[], shard?: ShardT) {
   const result = subsetList
     .slice(shardStart, shardEnd)
     .map(fontPipeExec);
-  return Promise.all(result);
+  return await Promise.all(result);
 }
