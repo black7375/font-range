@@ -25,5 +25,15 @@ coverage
 # Optional eslint cache
 .eslintcache
 
+# Zero install
+# .pnp.* # If not zero install
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
 # Misc
 .DS_Store
