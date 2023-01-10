@@ -1,7 +1,7 @@
 {
   "name": "font-range",
   "description": " Font subset with google font's ML result.",
-  "version": "0.2.1",
+  "version": "1.0.0",
   "author": "black7375 <alstjr7375@daum.net>",
   "license": "MIT",
   "keywords": [
@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/black7375/font-range#readme",
   "engines": {
-    "node": ">= 12.13"
+    "node": ">= 16.16"
   },
   "devDependencies": {
     "@types/command-exists": "^1.2.0",
@@ -62,7 +62,7 @@
     "tslib": "^2.4.1"
   },
   "volta": {
-    "node": "19.3.0",
+    "node": "16.16.0",
     "npm": "9.2.0"
   },
   "packageManager": "yarn@3.3.1"
