@@ -6,31 +6,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: volta-cli/action@v1
+    - uses: actions/checkout@v3
     - name: pip cache
       id: pip-cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-    - name: node cache
-      id: node-cache
-      uses: actions/cache@v2
-      with:
-        path: node_modules
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
     - run: pip install -r ./requirements.txt
-    - name: npm install
-      if: steps.node-cache.outputs.cache-hit != 'true'
-      run: npm install
-    - run: npm ci --no-audit
-    - run: npm run lint --if-present
-    - run: npm test
-    - run: npm run build --if-present
+    - run: yarn run lint
+    - run: yarn run build
       env:
         CI: true
+    - run: yarn test
