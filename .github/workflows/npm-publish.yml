@@ -78,4 +78,4 @@ jobs:
     - name: npm publish
       run: |
         yarn config set npmAuthToken ${{ secrets[matrix.token] }}
-        yarn run publish
+        yarn run npm publish --access public
