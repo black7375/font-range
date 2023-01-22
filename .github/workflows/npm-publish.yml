@@ -63,15 +63,8 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         registry-url: ${{ matrix.registry }}
-    - name: pip cache
-      id: pip-cache
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-    - run: pip install -r ./requirements.txt
+    - run: yarn config set npmPublishRegistry ${{ matrix.registry }}
+      if: matrix.branch == 'github-repo'
     - run: yarn build
       env:
         CI: true
