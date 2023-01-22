@@ -117,10 +117,10 @@ function loadAST(dirPath, url = exports.targets.korean, parseOption = parseOptio
         return (0, css_tree_1.parse)(css, parseOption);
     });
 }
-function setBlock(block, elem, property) {
-    if (elem.property === property) {
+function setBlock(block, elem, blockProp, elemProp) {
+    if (elem.property === elemProp) {
         if (elem.value.type === "Raw") {
-            block[property] = elem.value.value;
+            block[blockProp] = elem.value.value;
         }
     }
 }
@@ -135,8 +135,8 @@ function parseCSS(dirPath = "src", url = exports.targets.korean) {
                         unicodes: ""
                     };
                     (0, css_tree_1.walk)(node, { visit: "Declaration", enter(elem) {
-                            setBlock(block, elem, "src");
-                            setBlock(block, elem, "unicode-range");
+                            setBlock(block, elem, "src", "src");
+                            setBlock(block, elem, "unicodes", "unicode-range");
                         } });
                     if (block.src !== "" || block.unicodes !== "") {
                         parsed.push(block);

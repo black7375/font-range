@@ -1,7 +1,7 @@
 {
   "name": "@black7375/font-range",
   "description": " Font subset with google font's ML result.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "black7375 <alstjr7375@daum.net>",
   "license": "MIT",
   "keywords": [

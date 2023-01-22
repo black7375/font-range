@@ -141,10 +141,10 @@ interface BlockI {
   src:      string;
   unicodes: string;
 }
-function setBlock(block: BlockI, elem: Declaration, property: string) {
-  if(elem.property === property) {
+function setBlock(block: BlockI, elem: Declaration, blockProp: keyof BlockI, elemProp: string) {
+  if(elem.property === elemProp) {
     if(elem.value.type === "Raw") {
-      block[property] = elem.value.value;
+      block[blockProp] = elem.value.value;
     }
   }
 }
@@ -160,8 +160,8 @@ export async function parseCSS(dirPath = "src", url = targets.korean) {
         unicodes: ""
       };
       walk(node, { visit: "Declaration", enter(elem) {
-        setBlock(block, elem, "src");
-        setBlock(block, elem, "unicode-range");
+        setBlock(block, elem, "src",       "src");
+        setBlock(block, elem, "unicodes",  "unicode-range");
       }});
 
       if(block.src !== "" || block.unicodes !== "") {
