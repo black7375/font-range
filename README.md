@@ -21,7 +21,7 @@ Google Font provides a subset of [Korean](https://design.google/news/google-font
 It has dependencies on the following packages:
 
 ```sh
-pip install fonttools[ufo,woff,unicode] zopfli brotli
+pip3 install fonttools[ufo,woff,unicode] zopfli brotli
 ```
 
 ### Basics
@@ -164,7 +164,7 @@ fontPipe([{ font_path1 }, { font_path2 }], "<index>/<total>");
 
 - Environment Variable: Make it easy to use in CI, npm scripts, ..etc.
 ```sh
-SHARD=<index>/total
+SHARD="<index>/<total>"
 node subset.js
 ```
 
