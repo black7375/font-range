@@ -104,12 +104,29 @@ const parseOptions = {
     parseRulePrelude: false,
     parseValue: false
 };
+function existsDir(dirPath) {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        try {
+            yield (0, promises_1.stat)(dirPath);
+        }
+        catch (err) {
+            if (err.code === "ENOENT") {
+                try {
+                    yield (0, promises_1.mkdir)(dirPath);
+                }
+                catch (err) {
+                    if (err.code !== "EEXIST") {
+                        throw err;
+                    }
+                }
+            }
+        }
+    });
+}
 function loadAST(dirPath, url = exports.targets.korean, parseOption = parseOptions) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const cssPath = getCSSPath(dirPath, url);
-        if (!(0, fs_1.existsSync)(dirPath)) {
-            yield (0, promises_1.mkdir)(dirPath);
-        }
+        yield existsDir(dirPath);
         if (!(0, fs_1.existsSync)(cssPath)) {
             yield saveCSS(cssPath, url);
         }
@@ -301,8 +318,7 @@ exports.fontRange = fontRange;
 function fontSubset(fontPath = "", fontSubsetOption) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const { dirPath, initName, logMsg, baseOption, worker } = getOptionInfos(fontPath, fontSubsetOption);
-        if (!(0, fs_1.existsSync)(dirPath))
-            yield (0, promises_1.mkdir)(dirPath);
+        yield existsDir(dirPath);
         const subsetOption = getSubsetOption(fontSubsetOption);
         const saveOption = getSaveOption(dirPath, initName);
         const options = [fontPath, saveOption, subsetOption, ...baseOption];

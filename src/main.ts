@@ -1,6 +1,6 @@
 import { join, parse } from "path";
 import { createReadStream, createWriteStream, existsSync } from "fs";
-import { mkdir } from "fs/promises";
+import { stat, mkdir } from "fs/promises";
 
 import Piscina from "piscina";
 import fetch, { Headers } from "@esm2cjs/node-fetch";
@@ -124,11 +124,27 @@ const parseOptions: ParseOptions = {
   parseValue:         false
 };
 
+async function existsDir(dirPath: string) {
+  try {
+    await stat(dirPath);
+  }
+  catch (err) {
+    if (err.code === "ENOENT") {
+      try {
+        await mkdir(dirPath);
+      }
+      catch (err) {
+        if (err.code !== "EEXIST") {
+          throw err;
+        }
+      }
+    }
+  }
+}
+
 async function loadAST(dirPath: string, url = targets.korean, parseOption = parseOptions) {
   const cssPath = getCSSPath(dirPath, url);
-  if (!existsSync(dirPath)) {
-    await mkdir(dirPath);
-  }
+  await existsDir(dirPath)
   if (!existsSync(cssPath)) {
     await saveCSS(cssPath, url);
   }
@@ -405,7 +421,7 @@ export async function fontSubset(fontPath = "", fontSubsetOption?: FontSubsetOpt
     baseOption,
     worker
   } = getOptionInfos(fontPath, fontSubsetOption);
-  if(!existsSync(dirPath)) await mkdir(dirPath);
+  await existsDir(dirPath)
 
   const subsetOption = getSubsetOption(fontSubsetOption);
   const saveOption   = getSaveOption(dirPath, initName);
