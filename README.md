@@ -140,7 +140,7 @@ interface FontSubsetOptionI extends FontDefaultOptionI {
 
 It offers a simple API when doing a large amount of subsets.
 
-Performance is optimized using worker poll and provides sharding for distributed environments.
+Performance is optimized using worker pool and provides sharding for distributed environments.
 
 #### Option
 
