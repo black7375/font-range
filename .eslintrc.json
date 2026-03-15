@@ -9,27 +9,28 @@
     "project": "tsconfig.json",
     "sourceType": "module"
   },
-  "plugins": [
-    "@typescript-eslint",
-    "jest"
-  ],
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:jest/recommended",
-    "prettier"
-  ],
+  "plugins": ["@typescript-eslint"],
+  "extends": ["eslint:recommended"],
   "rules": {
     "@typescript-eslint/no-empty-function": [
-      "error", {
+      "error",
+      {
         "allow": ["private-constructors"]
       }
     ],
     "@typescript-eslint/no-unused-vars": [
-      "warn", {
+      "warn",
+      {
         "argsIgnorePattern": "^_"
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["**/*.test.ts", "__tests__/**/*.ts"],
+      "env": {
+        "jest": true
+      }
+    }
+  ]
 }
