@@ -253,27 +253,60 @@ function getOptionInfos(fontPath = "", fontOption, indexIndicate = "") {
         logMsg,
         baseOption,
         worker,
+        format,
         fromCSS: options.fromCSS
     };
 }
-function getSrcInfo(src) {
-    const first = src.split(",").find((str) => {
-        return str.indexOf("url(") === 0;
-    });
-    if (typeof first === "undefined")
-        return {
-            base: "",
-            index: 0
-        };
+function getURLCandidates(src) {
     const reStr = "url\\(";
     const reMdl = "(.+?)";
     const reEnd = "\\)";
     const quote = "(\\\\?['\"])?";
-    const regex = new RegExp(reStr + quote + reMdl + quote + reEnd);
-    const urlContent = first.match(regex)[2];
-    const parsedURL = (0, path_1.parse)(urlContent);
+    const regex = new RegExp(reStr + quote + reMdl + quote + reEnd, "g");
+    const candidates = [];
+    let matched = regex.exec(src);
+    while (matched !== null) {
+        const candidate = matched[2].trim();
+        if (candidate !== "") {
+            candidates.push(candidate);
+        }
+        matched = regex.exec(src);
+    }
+    return candidates;
+}
+function getURLCandidateByFormat(candidates, format) {
+    const normalizedFormat = getFormat(format).toLowerCase();
+    const target = candidates.find((candidate) => {
+        const parsedPath = (() => {
+            try {
+                return new URL(candidate).pathname;
+            }
+            catch (_a) {
+                return candidate;
+            }
+        })();
+        const ext = (0, path_1.parse)(parsedPath.split(/[?#]/)[0])
+            .ext.toLowerCase()
+            .replace(".", "");
+        return ext === normalizedFormat;
+    });
+    return (typeof target === "undefined") ? candidates[0] : target;
+}
+function getSrcInfo(src, format) {
+    const candidates = getURLCandidates(src);
+    if (candidates.length === 0)
+        return {
+            base: "",
+            name: "",
+            index: 0
+        };
+    const srcPath = (typeof format === "undefined")
+        ? candidates[0]
+        : getURLCandidateByFormat(candidates, format);
+    const parsedURL = (0, path_1.parse)(srcPath.split(/[?#]/)[0]);
     return {
         base: parsedURL.base,
+        name: parsedURL.name,
         index: parseInt(parsedURL.name.split(".").pop())
     };
 }
@@ -295,15 +328,18 @@ function getSubsetOption(fontSubsetOption) {
 }
 function fontRange(fontPath = "", url = exports.targets.korean, fontRangeOption) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { dirPath, initName, logMsg, baseOption, worker, fromCSS } = getOptionInfos(fontPath, fontRangeOption, "n");
+        const { dirPath, initName, logMsg, baseOption, worker, format, fromCSS } = getOptionInfos(fontPath, fontRangeOption, "n");
         const ranges = yield parseCSS(dirPath, url);
         const result = ranges.map(({ src, unicodes }, i) => tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const srcInfo = getSrcInfo(src);
-            const saveOption = getSaveOption(dirPath, (fromCSS === "srcName" && srcInfo.base !== "")
-                ? srcInfo.base
-                : initName, (fromCSS === "srcIndex" && srcInfo.base !== "")
+            const srcInfo = getSrcInfo(src, format);
+            const srcIndex = ((fromCSS === "srcIndex" && srcInfo.base !== "") &&
+                !Number.isNaN(srcInfo.index))
                 ? srcInfo.index
-                : i);
+                : i;
+            const srcName = (fromCSS === "srcName" && srcInfo.base !== "")
+                ? srcInfo.name + "." + getFormat(format)
+                : initName;
+            const saveOption = getSaveOption(dirPath, srcName, srcIndex);
             const unicodeRanges = unicodes.split(", ").join(",");
             const unicodeOption = "--unicodes=" + unicodeRanges;
             const options = [fontPath, saveOption, unicodeOption, ...baseOption];

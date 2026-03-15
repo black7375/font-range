@@ -4,6 +4,7 @@ import { unlink as remove, rm as removeDir, PathLike , NoParamCallback } from "f
 export const timeout = 60000;
 
 export const cssFile  = join("__tests__", "font", "NotoSansKR-Local.css"  );
+export const multiSrcCssFile = join("__tests__", "font", "NotoSansKR-MultiSrc.css");
 export const textFile = join("__tests__", "font", "subset_glyphs.txt"     );
 export const fontPath = join("__tests__", "font", "NotoSansKR-Regular.otf");
 export const fontInfo = parse(fontPath);

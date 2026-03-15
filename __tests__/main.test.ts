@@ -2,7 +2,7 @@ import { join } from "path";
 import { existsSync } from "fs";
 
 import { targets, parseCSS, fontRange, fontSubset, fontPipe } from "../src/main";
-import { timeout, cssFile, textFile, fontPath, fontDir, fontName, unlink, rmdir } from "./shared";
+import { timeout, cssFile, multiSrcCssFile, textFile, fontPath, fontDir, fontName, unlink, rmdir } from "./shared";
 
 // https://github.com/piscinajs/piscina/issues/83
 describe("FontRange Offline Feature", () => {
@@ -65,6 +65,109 @@ describe("FontRange srcName Option", () => {
     const fontFile2 = join(saveDir, "PbykFmXiEBPT4ITbgNA5Cgm20xz64px_1hVWr0wuPNGmlQNMEfD4.120.woff2");
     expect(existsSync(fontFile1)).toBe(true);
     expect(existsSync(fontFile2)).toBe(true);
+  }, timeout);
+});
+
+describe("FontRange srcIndex Format Awareness", () => {
+  const saveDir = join(fontDir, "srcIndex-format-aware");
+  afterAll(() => {
+    rmdir(saveDir);
+  });
+
+  it("uses the first url whose extension matches the requested format for srcIndex", async () => {
+    await fontRange(fontPath, multiSrcCssFile, {
+      saveDir,
+      nameFormat: "NotoSansKR-Regular.subset.{INDEX}{EXT}",
+      format:     "woff",
+      fromCSS:    "srcIndex"
+    });
+
+    const expected = join(saveDir, "NotoSansKR-Regular.subset.107.woff");
+    const rejected = join(saveDir, "NotoSansKR-Regular.subset.7.woff");
+    expect(existsSync(expected)).toBe(true);
+    expect(existsSync(rejected)).toBe(false);
+  }, timeout);
+});
+
+describe("FontRange srcIndex Ordered Selection", () => {
+  const saveDir = join(fontDir, "srcIndex-ordered");
+  afterAll(() => {
+    rmdir(saveDir);
+  });
+
+  it("uses the first matching url when multiple urls share the requested format", async () => {
+    await fontRange(fontPath, multiSrcCssFile, {
+      saveDir,
+      nameFormat: "NotoSansKR-Regular.subset.{INDEX}{EXT}",
+      format:     "woff",
+      fromCSS:    "srcIndex"
+    });
+
+    const expected = join(saveDir, "NotoSansKR-Regular.subset.109.woff");
+    const rejected = join(saveDir, "NotoSansKR-Regular.subset.209.woff");
+    expect(existsSync(expected)).toBe(true);
+    expect(existsSync(rejected)).toBe(false);
+  }, timeout);
+});
+
+describe("FontRange srcIndex Fallback Order", () => {
+  const saveDir = join(fontDir, "srcIndex-noindex");
+  afterAll(() => {
+    rmdir(saveDir);
+  });
+
+  it("falls back to the generated order index when the selected url has no numeric suffix for srcIndex", async () => {
+    await fontRange(fontPath, multiSrcCssFile, {
+      saveDir,
+      nameFormat: "NotoSansKR-Regular.subset.{INDEX}{EXT}",
+      format:     "woff",
+      fromCSS:    "srcIndex"
+    });
+
+    const expected = join(saveDir, "NotoSansKR-Regular.subset.4.woff");
+    const rejected = join(saveDir, "NotoSansKR-Regular.subset.NaN.woff");
+    expect(existsSync(expected)).toBe(true);
+    expect(existsSync(rejected)).toBe(false);
+  }, timeout);
+});
+
+describe("FontRange srcName Format Awareness", () => {
+  const saveDir = join(fontDir, "srcName-format-aware");
+  afterAll(() => {
+    rmdir(saveDir);
+  });
+
+  it("reuses the selected url stem but forces the output extension for srcName", async () => {
+    await fontRange(fontPath, multiSrcCssFile, {
+      saveDir,
+      format:  "woff",
+      fromCSS: "srcName"
+    });
+
+    const expected = join(saveDir, "NameAware.211.woff");
+    const rejected = join(saveDir, "NameAware.211.woff2");
+    expect(existsSync(expected)).toBe(true);
+    expect(existsSync(rejected)).toBe(false);
+  }, timeout);
+});
+
+describe("FontRange srcName Fallback", () => {
+  const saveDir = join(fontDir, "srcName-fallback");
+  afterAll(() => {
+    rmdir(saveDir);
+  });
+
+  it("falls back to the first url when no url matches the requested format", async () => {
+    await fontRange(fontPath, multiSrcCssFile, {
+      saveDir,
+      format:  "woff",
+      fromCSS: "srcName"
+    });
+
+    const expected = join(saveDir, "FallbackFirst.8.woff");
+    const rejected = join(saveDir, "FallbackSecond.208.woff");
+    expect(existsSync(expected)).toBe(true);
+    expect(existsSync(rejected)).toBe(false);
   }, timeout);
 });
 

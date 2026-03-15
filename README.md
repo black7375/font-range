@@ -117,9 +117,9 @@ interface FontRangeOptionI extends FontDefaultOptionI {
 ```
 - `default`: The `index` of the file name increases in the generated order
 - `srcIndex`: The `index` of the file name uses [`src`](https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/src) in CSS [#9](https://github.com/black7375/font-range/issues/9)
-  - Based on the first `url()`
+  - Chooses the first `url()` that matches the requested output format; otherwise use the first `url()`.
 - `srcName`: The file name uses [`src`](https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/src) in CSS
-  - Based on the first `url()`
+  - Uses the first `url()` that matches the requested output format; otherwise use the first `url()`.
 
 ### Font Subset
 

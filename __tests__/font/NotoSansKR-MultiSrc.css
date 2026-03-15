@@ -1,0 +1,58 @@
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    local('Noto Sans KR'),
+    url('./fonts/FormatAware.7.woff2') format('woff2'),
+    url('./fonts/FormatAware.107.woff') format('woff');
+  unicode-range: U+0000-007F;
+}
+
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    local('Noto Sans KR'),
+    url('./fonts/NameAware.11.woff2') format('woff2'),
+    url('./fonts/NameAware.211.woff') format('woff');
+  unicode-range: U+0080-00FF;
+}
+
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    local('Noto Sans KR'),
+    url('./fonts/FallbackFirst.8.woff2') format('woff2'),
+    url('./fonts/FallbackSecond.208.ttf') format('truetype');
+  unicode-range: U+0370-03FF;
+}
+
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    local('Noto Sans KR'),
+    url('./fonts/Ordered.109.woff') format('woff'),
+    url('./fonts/Ordered.209.woff') format('woff');
+  unicode-range: U+0400-04FF;
+}
+
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    local('Noto Sans KR'),
+    url('./fonts/NoIndex.woff') format('woff');
+  unicode-range: U+0500-052F;
+}

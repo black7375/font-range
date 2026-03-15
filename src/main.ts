@@ -323,32 +323,68 @@ function getOptionInfos(fontPath = "", fontOption?: ArgOptionsT, indexIndicate =
     baseOption,
     worker,
 
+    format,
     fromCSS: options.fromCSS
   };
 }
 
 // == Options - Others =========================================================
-function getSrcInfo(src: string) {
-  const first = src.split(",").find((str) => {
-    return str.indexOf("url(") === 0;
-  });
-  if(typeof first === "undefined") return {
-    base:  "",
-    index: 0
-  };
-
+function getURLCandidates(src: string) {
   const reStr = "url\\(";
   const reMdl = "(.+?)";
   const reEnd = "\\)";
   const quote = "(\\\\?['\"])?";
   const regex = new RegExp(
-    reStr + quote + reMdl + quote + reEnd
+    reStr + quote + reMdl + quote + reEnd,
+    "g"
   );
 
-  const urlContent = first.match(regex)[2];
-  const parsedURL  = parse(urlContent);
+  const candidates = [] as string[];
+  let matched = regex.exec(src);
+  while(matched !== null) {
+    const candidate = matched[2].trim();
+    if(candidate !== "") {
+      candidates.push(candidate);
+    }
+    matched = regex.exec(src);
+  }
+  return candidates;
+}
+
+function getURLCandidateByFormat(candidates: string[], format: Format) {
+  const normalizedFormat = getFormat(format).toLowerCase();
+  const target = candidates.find((candidate) => {
+    const parsedPath = (() => {
+      try {
+        return new URL(candidate).pathname;
+      }
+      catch {
+        return candidate;
+      }
+    })();
+    const ext = parse(parsedPath.split(/[?#]/)[0])
+      .ext.toLowerCase()
+      .replace(".", "");
+    return ext === normalizedFormat;
+  });
+
+  return (typeof target === "undefined") ? candidates[0] : target;
+}
+function getSrcInfo(src: string, format?: Format) {
+  const candidates = getURLCandidates(src);
+  if(candidates.length === 0) return {
+    base:  "",
+    name:  "",
+    index: 0
+  };
+
+  const srcPath = (typeof format === "undefined")
+    ? candidates[0]
+    : getURLCandidateByFormat(candidates, format);
+  const parsedURL  = parse(srcPath.split(/[?#]/)[0]);
   return {
     base:  parsedURL.base,
+    name:  parsedURL.name,
     index: parseInt(
       parsedURL.name.split(".").pop()  // google font index at latest
     )
@@ -385,20 +421,24 @@ export async function fontRange(fontPath = "", url = targets.korean, fontRangeOp
     baseOption,
     worker,
 
+    format,
     fromCSS
   } = getOptionInfos(fontPath, fontRangeOption, "n");
 
   const ranges = await parseCSS(dirPath, url);
   const result = ranges.map(async ({src, unicodes}, i) => {
-    const srcInfo       = getSrcInfo(src);
-    const saveOption    = getSaveOption(
+    const srcInfo    = getSrcInfo(src, format);
+    const srcIndex   = ((fromCSS === "srcIndex" && srcInfo.base !== "") &&
+                       !Number.isNaN(srcInfo.index))
+      ? srcInfo.index
+      : i;
+    const srcName    = (fromCSS === "srcName"  && srcInfo.base !== "")
+      ? srcInfo.name + "." + getFormat(format)
+      : initName;
+    const saveOption = getSaveOption(
       dirPath,
-      (fromCSS === "srcName"  && srcInfo.base !== "")
-        ? srcInfo.base
-        : initName,
-      (fromCSS === "srcIndex" && srcInfo.base !== "")
-        ? srcInfo.index
-        : i
+      srcName,
+      srcIndex
     );
     const unicodeRanges = unicodes.split(", ").join(",");
     const unicodeOption = "--unicodes=" + unicodeRanges;
