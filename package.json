@@ -53,8 +53,8 @@
     "build": "tsc -p tsconfig.release.json",
     "build:watch": "tsc -w -p tsconfig.release.json",
     "lint": "eslint . --ext .ts,.tsx",
-    "test": "jest --coverage --detectOpenHandles --forceExit",
-    "test:watch": "jest --watch"
+    "test": "NODE_OPTIONS=\"$NODE_OPTIONS --require=./jest-require-resolve-paths.cjs\" jest --coverage --detectOpenHandles --forceExit",
+    "test:watch": "NODE_OPTIONS=\"$NODE_OPTIONS --require=./jest-require-resolve-paths.cjs\" jest --watch"
   },
   "dependencies": {
     "@esm2cjs/execa": "^6.1.1-cjs.1",
